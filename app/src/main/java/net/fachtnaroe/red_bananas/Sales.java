@@ -340,9 +340,8 @@ public class Sales extends Form implements HandlesEventDispatching {
     }
 
     public void webGotText(String status, String textOfResponse) {
-//        String temp=new String();
+
         List<String> MyOrders;
-//        Log.w("RESULT", textOfResponse);
         if (status.equals("200") ) try {
             MyOrders = new ArrayList<String>();
             // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
@@ -350,15 +349,10 @@ public class Sales extends Form implements HandlesEventDispatching {
             if (!parser.getString("orders").equals("")) {
                 JSONArray jsonIsMySon = parser.getJSONArray("orders");
                 for (int i = 0; i < jsonIsMySon.length(); i++) {
-//Log.w("ONESALE", jsonIsMySon.getJSONObject(i).toString());
                   if (Integer.valueOf(jsonIsMySon.getJSONObject(i).getString("sellerID"))== Integer.valueOf(pID)){
                       String oneentryonthelistofthingssold="Buyer is: " +
                               jsonIsMySon.getJSONObject(i).getString("buyerID");
                     MyOrders.add(oneentryonthelistofthingssold);
-//                    Log.w("FOYUNDMATCH","YURU");
-                  }
-                  else {
-//                      Log.w("NO MATCH",jsonIsMySon.getJSONObject(i).getString("sellerID").toString() + " " + pID.toString());
                   }
                 }
                 YailList tempData = YailList.makeList(MyOrders);

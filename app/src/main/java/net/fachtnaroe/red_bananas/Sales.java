@@ -1,6 +1,7 @@
 package net.fachtnaroe.red_bananas;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
@@ -13,8 +14,10 @@ import com.google.appinventor.components.runtime.ListView;
 import com.google.appinventor.components.runtime.Notifier;
 import com.google.appinventor.components.runtime.VerticalArrangement;
 import com.google.appinventor.components.runtime.Web;
+import com.google.appinventor.components.runtime.util.YailList;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -32,7 +35,7 @@ public class Sales extends Form implements HandlesEventDispatching {
             pID =MainActivity.getPID(),
             SessionID=MainActivity.getSessionID(),
             getThingsForSaleURL =baseURL+"sessionID="+SessionID+"&entity=thing&method=GET",
-            getThingsSoldURL=baseURL+"sessionID="+SessionID+"&entity=orders2&method=GET",
+            getThingsSoldURL=baseURL+"sessionID="+SessionID+"&entity=orders&method=GET",
             webThingDeletURL=baseURL+"sessionID="+SessionID+"&entity=thing&method=DELETE&tID=",
             webOrderIsCompleteURL=baseURL+"sessionID="+SessionID+"&entity=orders&method=DELETE&oID=";
     private Web webGetThings4Sale,webGetThingsSold,webThingDelete,webOrderIsComplete;
@@ -47,9 +50,8 @@ public class Sales extends Form implements HandlesEventDispatching {
         GotTextNotifier.TextColor(Component.COLOR_WHITE);
 
         VArr = new VerticalArrangement(this);
-        VArr.HeightPercent(100);
-        VArr.WidthPercent(100);
-
+        VArr.Height(LENGTH_FILL_PARENT);
+        VArr.Width(LENGTH_FILL_PARENT);
 
         titleFDS = new Label(VArr);
         titleFDS.Text("Food Delivery Service");
@@ -128,7 +130,7 @@ public class Sales extends Form implements HandlesEventDispatching {
         thingsSold = new ListView(VArr);
         thingsSold.WidthPercent(100);
         thingsSold.HeightPercent(30);
-        thingsSold.TextSize(18);
+        thingsSold.TextSize(35);
         thingsSold.BackgroundColor(COLOR_DKGRAY);
 
         btnOrderIsCompleted = new Button(VArr);
@@ -185,7 +187,8 @@ public class Sales extends Form implements HandlesEventDispatching {
             return true;
         }
         if(component.equals(webGetThingsSold) && eventName.equals("GotText")){
-            sortJson4GetThingsSold((String)params[3]);
+//            sortJson4GetThingsSold((String)params[3], pID);
+            webGotText((String) params[1],(String) params[3]);
             return true;
         }
 
@@ -231,12 +234,15 @@ public class Sales extends Form implements HandlesEventDispatching {
             startActivity(getIntent());
         }
     }
-    public void sortJson4GetThingsSold(String jsonString){
+    public void sortJson4GetThingsSold(String jsonString, String pID){
 
         // for loop to sort by sellerID with pID
         String Temp1 = "";
         //Used https://stackoverflow.com/questions/48449004/java-storing-the-output-of-a-for-loop-into-an-array/48449039 and https://www.w3schools.com/java/java_ref_string.asp
         List<String> jsonIsMySon = new ArrayList<String>();
+        Log.w("PUTSOMETHINGHERE","IN");
+        Log.w("PROG",pID);
+        Log.w("fdg",jsonString);
         char start = '{';
         char finish = '}';
         int e = 0;
@@ -248,8 +254,11 @@ public class Sales extends Form implements HandlesEventDispatching {
             else if ((thisChar == finish)) {
                 String Temp2 = jsonString.substring(e, i);
                 if (!(Temp2.contains("]"))){
-                    if (Temp2.contains("sellerID\":\"")) {
+                    if (Temp2.contains("sellerID\":\""+ pID)) {
                         jsonIsMySon.add(Temp2);
+                    }
+                    else {
+                        Log.w("pID not matched ",Temp2);
                     }
                 }
             }
@@ -262,7 +271,7 @@ public class Sales extends Form implements HandlesEventDispatching {
             String r2 = r1.replace(",", "-");
             String[] keyValueArray = r2.split("<SPLIT>");
             //Rearrange Json data [0]=Name,[1]=oID,[2]=sellerID,[3]=slotNum,[4]=tName
-            jsonIsMySon.set(a,"["+keyValueArray[1]+"]"+keyValueArray[4]+" for "+keyValueArray[0]+keyValueArray[3]);
+            jsonIsMySon.set(a,"["+keyValueArray[1]+"]"+keyValueArray[4]+" for "+keyValueArray[0]+keyValueArray[3]+"["+ keyValueArray[2] + "]");
             if(a==0){
                 Temp3+=jsonIsMySon.get(a);
             }
@@ -275,7 +284,7 @@ public class Sales extends Form implements HandlesEventDispatching {
         String r3 = r2.replace("{\"Name","");
         String r4 = r3.replace("oID","");
         String r5 = r4.replace("sellerID","");
-        String r6 = r5.replace(pID,"");
+        String r6 = r5;//.replace(pID,"");
         String r7 = r6.replace("slotNum"," Slot:");
         String r8 = r7.replace("tName","");
         String r9 = r8.replace("\"","");
@@ -328,5 +337,32 @@ public class Sales extends Form implements HandlesEventDispatching {
         String r5 = r4.replace("tName","");
         String r6 = r5.replace("tPrice","");
        thingsWeSell.ElementsFromString(r6);
+    }
+
+    public void webGotText(String status, String textOfResponse) {
+//        String temp=new String();
+        List<String> MyOrders;
+        if (status.equals("200") ) try {
+            MyOrders = new ArrayList<String>();
+            // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
+            JSONObject parser = new JSONObject(textOfResponse);
+            if (!parser.getString("orders").equals("")) {
+                JSONArray jsonIsMySon = parser.getJSONArray("orders");
+                for (int i = 0; i < jsonIsMySon.length(); i++) {
+
+                  if (jsonIsMySon.getJSONObject(i).getString("sellerID")==pID){
+                    MyOrders.add(jsonIsMySon.getJSONObject(i).toString());
+                  }
+                }
+                YailList tempData = YailList.makeList(MyOrders);
+                thingsSold.Elements(tempData);
+            }
+        } catch (JSONException e) {
+            // if an exception occurs, code for it in here
+            GotTextNotifier.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
+        }
+        else {
+            GotTextNotifier.ShowMessageDialog("Error 3.356; Problem connecting with server","Information", "OK");
+        }
     }
  }

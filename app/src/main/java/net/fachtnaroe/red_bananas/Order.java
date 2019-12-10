@@ -266,13 +266,10 @@ public class Order extends Form implements HandlesEventDispatching {
         //For Loop to Rearrange Data To How I want
         String Temp3="";
         for (int a=0;a<jsonIsMySon.size();a++){
-//            String tempi="";
-
-                String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
-                String r2 = r1.replace(",", "-");
-//                tempi = r2.replace("*@*", ",");
-
+            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
+            String r2 = r1.replace(",", "-");
             String[] keyValueArray = r2.split("<SPLIT>");
+            //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy
             jsonIsMySon.set(a,"["+keyValueArray[1]+":"+keyValueArray[5]+"]"+keyValueArray[2]+"("+keyValueArray[0]+")€"+keyValueArray[4]);
 
 
@@ -339,11 +336,11 @@ public class Order extends Form implements HandlesEventDispatching {
 
         String Temp3="";
         for (int a=0;a<jsonIsMySon.size();a++){
-            String r1 = jsonIsMySon.get(a).replace("\",\"",",");
-
+            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
+            String r2 = r1.replace(",", "-");
+            String[] keyValueArray = r2.split("<SPLIT>");
             //Rearrange Json data [0]=buyerID,[1]=oID,[2]=seller name ,[3]=tID,[4]=tName-ItemName
-            String[] keyValueArray = r1.split(",");
-            jsonIsMySon.set(a,"["+keyValueArray[1]+"] "+keyValueArray[4]+" from "+keyValueArray[2]);
+             jsonIsMySon.set(a,"["+keyValueArray[1]+"] "+keyValueArray[4]+" from "+keyValueArray[2]);
             if(a==0){
                 Temp3+=jsonIsMySon.get(a);
             }

@@ -1,7 +1,6 @@
 package net.fachtnaroe.red_bananas;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
@@ -27,9 +26,9 @@ import java.util.List;
 public class Sales extends Form implements HandlesEventDispatching {
     private Button butt1, btnDelete, btnAddNew, btnOrderIsCompleted;
     private VerticalArrangement VArr;
-    private HorizontalArrangement HArr_User_pID, HArr2Btn, HArr1Btn;
+    private HorizontalArrangement HArr_User_pID, HArr2Btn;
     private Label titleFDS, Label_Username, Username_L, Label_pID, pId_L, things4Sale_Label, thingsSold_Label;
-    private ListView thingsWeSell, thingsSold;
+    private ListView thingsWeSell_ListView, OrdersPlaced_ListView;
     private String baseURL = "https://fachtnaroe.net/bananas?",
             TheUsername = MainActivity.getUsername(),
             pID = MainActivity.getPID(),
@@ -99,11 +98,11 @@ public class Sales extends Form implements HandlesEventDispatching {
         things4Sale_Label.Text("My things for sale");
 
         //put a listview here(muoy impotante)
-        thingsWeSell = new ListView(VArr);
-        thingsWeSell.WidthPercent(100);
-        thingsWeSell.HeightPercent(30);
-        thingsWeSell.TextSize(35);
-        thingsWeSell.BackgroundColor(COLOR_DKGRAY);
+        thingsWeSell_ListView = new ListView(VArr);
+        thingsWeSell_ListView.WidthPercent(100);
+        thingsWeSell_ListView.HeightPercent(30);
+        thingsWeSell_ListView.TextSize(35);
+        thingsWeSell_ListView.BackgroundColor(COLOR_DKGRAY);
 
         HArr2Btn = new HorizontalArrangement(VArr);
         HArr2Btn.WidthPercent(100);
@@ -126,11 +125,11 @@ public class Sales extends Form implements HandlesEventDispatching {
         thingsSold_Label.TextColor(COLOR_WHITE);
 
         //Listview Here
-        thingsSold = new ListView(VArr);
-        thingsSold.WidthPercent(100);
-        thingsSold.HeightPercent(30);
-        thingsSold.TextSize(35);
-        thingsSold.BackgroundColor(COLOR_DKGRAY);
+        OrdersPlaced_ListView = new ListView(VArr);
+        OrdersPlaced_ListView.WidthPercent(100);
+        OrdersPlaced_ListView.HeightPercent(30);
+        OrdersPlaced_ListView.TextSize(35);
+        OrdersPlaced_ListView.BackgroundColor(COLOR_DKGRAY);
 
         btnOrderIsCompleted = new Button(VArr);
         btnOrderIsCompleted.WidthPercent(100);
@@ -169,26 +168,22 @@ public class Sales extends Form implements HandlesEventDispatching {
                 return true;
             }
             if (component.equals(btnDelete)) {
-                things4Sale_Label.Text(things4Sale_Label.Text() + " >");
-                deletThis(thingsWeSell.Selection());
+                deletThis(thingsWeSell_ListView.Selection());
                 return true;
             }
             if (component.equals(btnOrderIsCompleted)) {
-                thingsSold_Label.Text(thingsSold_Label.Text() + " >");
-                removeCompletedOrder(thingsSold.Selection());
+                removeCompletedOrder(OrdersPlaced_ListView.Selection());
                 return true;
             }
         }
         if (component.equals(webGetThings4Sale) && eventName.equals("GotText")) {
-//            JSONObject  obj = new  JSONObject((String)params[3]);
-//            JSONArray arr = obj.getJSONArray("thing");
-//            //String temporary =obj.getJSONObject("thing").getString("tName");
-            sortJson4GetThings4Sale((String) params[3], pID);
+            //calling the procedure For the ListView containing the Items that the seller has for sale
+            jsonSortAndListViewForSellerScreen(params[1].toString(), (String) params[3],"thing", "tSoldBy");
             return true;
         }
         if (component.equals(webGetThingsSold) && eventName.equals("GotText")) {
-//            sortJson4GetThingsSold((String)params[3], pID);
-            webGotText(params[1].toString(), (String) params[3]);
+            //calling the procedure For the ListView containing the Orders that have been placed to the seller
+            jsonSortAndListViewForSellerScreen(params[1].toString(), (String) params[3],"orders", "sellerID");
             return true;
         }
 
@@ -206,14 +201,14 @@ public class Sales extends Form implements HandlesEventDispatching {
     }
 
     public void removeCompletedOrder(String selection) {
-        if ((thingsSold.Selection().isEmpty())) {
+        if ((OrdersPlaced_ListView.Selection().isEmpty())) {
             GotTextNotifier.ShowAlert("No Order Selected");
         } else {
-            String oIDForURL = selection.substring(1, 3);
+            int endPoint = selection.indexOf(']');
+            String oIDForURL = selection.substring(1, endPoint);
             webOrderIsComplete.Url(webOrderIsCompleteURL + oIDForURL);
             webOrderIsComplete.Get();
             GotTextNotifier.ShowAlert("Order " + oIDForURL + " removed");
-            //webGetThingsSold.Get();
             //https://stackoverflow.com/questions/3053761/reload-activity-in-android
             finish();
             startActivity(getIntent());
@@ -221,141 +216,56 @@ public class Sales extends Form implements HandlesEventDispatching {
     }
 
     public void deletThis(String selection) {
-        if ((thingsWeSell.Selection().isEmpty())) {
+        if ((thingsWeSell_ListView.Selection().isEmpty())) {
             GotTextNotifier.ShowAlert("No Item Selected");
         } else {
-            String tIDForURL = selection.substring(1, 3);
+            int endPoint = selection.indexOf(']');
+            String tIDForURL = selection.substring(1, endPoint);
             webThingDelete.Url(webThingDeletURL + tIDForURL);
             webThingDelete.Get();
             GotTextNotifier.ShowAlert("Item " + tIDForURL + " removed");
-            //webGetThings4Sale.Get();
-            //thingsWeSell.ElementsFromString("");
-//            thingsWeSell.SelectionColor(Component.COLOR_RED);
-//            titleFDS.Text("delet");
+            //https://stackoverflow.com/questions/3053761/reload-activity-in-android
             finish();
             startActivity(getIntent());
         }
     }
-
-    public void sortJson4GetThingsSold(String jsonString, String pID) {
-
-        // for loop to sort by sellerID with pID
-        String Temp1 = "";
-        //Used https://stackoverflow.com/questions/48449004/java-storing-the-output-of-a-for-loop-into-an-array/48449039 and https://www.w3schools.com/java/java_ref_string.asp
-        List<String> jsonIsMySon = new ArrayList<String>();
-        Log.w("PUTSOMETHINGHERE", "IN");
-        Log.w("PROG", pID);
-        Log.w("fdg", jsonString);
-        char start = '{';
-        char finish = '}';
-        int e = 0;
-        for (int i = 0; i < jsonString.length(); i++) {
-            char thisChar = jsonString.charAt(i);
-            if (thisChar == start) {
-                e = i;
-            } else if ((thisChar == finish)) {
-                String Temp2 = jsonString.substring(e, i);
-                if (!(Temp2.contains("]"))) {
-                    if (Temp2.contains("sellerID\":\"" + pID)) {
-                        jsonIsMySon.add(Temp2);
-                    } else {
-                        Log.w("pID not matched ", Temp2);
-                    }
-                }
-            }
-
-        }
-        //For Loop to Rearrange Data To How I want
-        String Temp3 = "";
-        for (int a = 0; a < jsonIsMySon.size(); a++) {
-            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
-            String r2 = r1.replace(",", "-");
-            String[] keyValueArray = r2.split("<SPLIT>");
-            //Rearrange Json data [0]=Name,[1]=oID,[2]=sellerID,[3]=slotNum,[4]=tName
-            jsonIsMySon.set(a, "[" + keyValueArray[1] + "]" + keyValueArray[4] + " for " + keyValueArray[0] + keyValueArray[3] + "[" + keyValueArray[2] + "]");
-            if (a == 0) {
-                Temp3 += jsonIsMySon.get(a);
-            } else {
-                Temp3 += "," + jsonIsMySon.get(a);
-            }
-        }
-        //Format for use in listView-Remove KeyNames
-        String r2 = Temp3.replace("\":\"", "");
-        String r3 = r2.replace("{\"Name", "");
-        String r4 = r3.replace("oID", "");
-        String r5 = r4.replace("sellerID", "");
-        String r6 = r5;//.replace(pID,"");
-        String r7 = r6.replace("slotNum", " Slot:");
-        String r8 = r7.replace("tName", "");
-        String r9 = r8.replace("\"", "");
-        thingsSold.ElementsFromString(r9);
-    }
-
-    public void sortJson4GetThings4Sale(String jsonString, String pID) {
-        // for loop to sort by pID
-        String Temp1 = "";
-        //Used https://stackoverflow.com/questions/48449004/java-storing-the-output-of-a-for-loop-into-an-array/48449039 and https://www.w3schools.com/java/java_ref_string.asp
-        List<String> jsonIsMySon = new ArrayList<String>();
-        char start = '{';
-        char finish = '}';
-        int e = 0;
-        for (int i = 0; i < jsonString.length(); i++) {
-            char thisChar = jsonString.charAt(i);
-            if (thisChar == start) {
-
-                e = i + 1;
-            } else if ((thisChar == finish)) {
-                String Temp2 = jsonString.substring(e, i);
-                if (!(Temp2.contains("]"))) {
-                    if (Temp2.contains("tSoldBy\":\"" + pID)) {
-                        jsonIsMySon.add(Temp2);
-                    }
-                }
-            }
-
-        }
-        //For Loop to Rearrange Data To How I want
-        String Temp3 = "";
-        for (int a = 0; a < jsonIsMySon.size(); a++) {
-            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
-            String r2 = r1.replace(",", "-");
-            String[] keyValueArray = r2.split("<SPLIT>");
-            //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy
-            jsonIsMySon.set(a, "[" + keyValueArray[1] + "]" + keyValueArray[2] + "(" + keyValueArray[0] + ")€" + keyValueArray[4]);
-            if (a == 0) {
-                Temp3 += jsonIsMySon.get(a);
-            } else {
-                Temp3 += "," + jsonIsMySon.get(a);
-            }
-        }
-
-        //Format for use in listView-Remove KeyNames
-        String r2 = Temp3.replace("\":\"", "");
-        String r3 = r2.replace("\"tDescription", "");
-        String r4 = r3.replace("tID", "");
-        String r5 = r4.replace("tName", "");
-        String r6 = r5.replace("tPrice", "");
-        thingsWeSell.ElementsFromString(r6);
-    }
-
-    public void webGotText(String status, String textOfResponse) {
-
-        List<String> MyOrders;
+    //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
+    public void jsonSortAndListViewForSellerScreen(String status, String textOfResponse, String tableName, String fieldName) {
+        List<String> ListViewItemArray;
         if (status.equals("200")) try {
-            MyOrders = new ArrayList<String>();
+            ListViewItemArray = new ArrayList<String>();
             // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
             JSONObject parser = new JSONObject(textOfResponse);
-            if (!parser.getString("orders").equals("")) {
-                JSONArray jsonIsMySon = parser.getJSONArray("orders");
+            if (!parser.getString(tableName).equals("")) {
+                JSONArray jsonIsMySon = parser.getJSONArray(tableName);
                 for (int i = 0; i < jsonIsMySon.length(); i++) {
-                    if (Integer.valueOf(jsonIsMySon.getJSONObject(i).getString("sellerID")) == Integer.valueOf(pID)) {
-                        String oneentryonthelistofthingssold = "Buyer is: " +
-                                jsonIsMySon.getJSONObject(i).getString("buyerID");
-                        MyOrders.add(oneentryonthelistofthingssold);
+                    if (Integer.valueOf(jsonIsMySon.getJSONObject(i).getString(fieldName)).equals( Integer.valueOf(pID))) {
+                        String oneEntryInTheListView = "";
+                        //add data from table to the sting above by getting the field name you want from the brief ( example where field name is "sellerID": oneEntryInTheListView = jsonIsMySon.getJSONObject(i).getString("sellerID"); )
+                        //formats entries the ListView containing the orders
+                        if (tableName.equals("orders") && fieldName.equals("sellerID")){
+                                oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("oID")
+                                    + "] buyer: " + jsonIsMySon.getJSONObject(i).getString("buyerID")
+                                    + " (slotNum: " + jsonIsMySon.getJSONObject(i).getString("slotNum")
+                                    + ") [" + jsonIsMySon.getJSONObject(i).getString("tID") + "]";
+                        }
+                        //formats entries the ListView containing the items sold by seller
+                        if (tableName.equals("thing") && fieldName.equals("tSoldBy")){
+                            oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("tID")
+                                    + "] " + jsonIsMySon.getJSONObject(i).getString("tName")
+                                    + " (" + jsonIsMySon.getJSONObject(i).getString("tDescription")
+                                    + ") €" + jsonIsMySon.getJSONObject(i).getString("tPrice");
+                        }
+                        ListViewItemArray.add(oneEntryInTheListView);
                     }
                 }
-                YailList tempData = YailList.makeList(MyOrders);
-                thingsSold.Elements(tempData);
+                YailList tempData = YailList.makeList(ListViewItemArray);
+                if (tableName.equals("orders") && fieldName.equals("sellerID")) {
+                    OrdersPlaced_ListView.Elements(tempData);
+                }
+                if (tableName.equals("thing") && fieldName.equals("tSoldBy")) {
+                    thingsWeSell_ListView.Elements(tempData);
+                }
             }
         } catch (JSONException e) {
             // if an exception occurs, code for it in here

@@ -81,7 +81,6 @@ public class MainActivity extends Form implements HandlesEventDispatching {
 
         username = new TextBox(Harr2);
         username.WidthPercent(70);
-        username.Text("redshop");
 
         PasswL = new Label(Harr3);
         PasswL.WidthPercent(LENGTH_FILL_PARENT);
@@ -90,7 +89,6 @@ public class MainActivity extends Form implements HandlesEventDispatching {
 
         password = new PasswordTextBox(Harr3);
         password.WidthPercent(70);
-        password.Text("tcfetcfe");
 
         buyer = new CheckBox(Harr4);
         buyer.Text("Buyer");

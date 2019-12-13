@@ -1,5 +1,7 @@
 package net.fachtnaroe.red_bananas;
 
+import android.util.Log;
+
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.EventDispatcher;
@@ -12,6 +14,11 @@ import com.google.appinventor.components.runtime.ListView;
 import com.google.appinventor.components.runtime.Notifier;
 import com.google.appinventor.components.runtime.VerticalScrollArrangement;
 import com.google.appinventor.components.runtime.Web;
+import com.google.appinventor.components.runtime.util.YailList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +36,7 @@ public class Order extends Form implements HandlesEventDispatching {
             username = MainActivity.getUsername(),
             getCreditURL = baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID;
     private Web Web_TfS, Web_TB, Web_Credit, Web_Credit2, Web_PlaceOrder;
-    private File FileDBS;
     private Notifier messages;
-    private Double newCredit;
-
 
     protected void $define() {
         VArr = new VerticalScrollArrangement(this);
@@ -156,7 +160,7 @@ public class Order extends Form implements HandlesEventDispatching {
         Web_TB.Get();
 
         Web_Credit = new Web(this);
-        Web_Credit.Url(baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID);
+        Web_Credit.Url(getCreditURL);
         Web_Credit.Get();
 
         Web_Credit2 = new Web(this);
@@ -178,12 +182,12 @@ public class Order extends Form implements HandlesEventDispatching {
             }
         }
         if (component.equals(Web_TfS) && eventName.equals("GotText")) {
-            JsonSortThingsListView((String) params[3]);
+            jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"thing", "null");
             return true;
         }
         if (component.equals(Web_TB) && eventName.equals("GotText")
         ) {
-            sortJsonShite((String) params[3]);
+            jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"prettyorders", "buyerID");
             return true;
         }
         if (component.equals(Web_Credit) && eventName.equals("GotText")) {
@@ -209,19 +213,11 @@ public class Order extends Form implements HandlesEventDispatching {
             int i = x.indexOf("]");
             int euro = x.indexOf("€") + 1;
             String price = x.substring(euro);
-
-
             String oldCredit = LBL_CreditTXT.Text().replace("€", "");
-//            newCredit=Double.parseDouble(oldCredit)-Double.parseDouble(price);
-//            String s=Double
-//            LBL_Ordered.Text(Double.toString(newCredit));
-//            LBL_CreditTXT.Text("€"+newCredit);
-//            LBL_Ordered.Text(oldCredit+" "+price);
             String y = x.substring(1, i);
             String[] url_IDs = y.split(":");
             Web_PlaceOrder.Url(baseURL + "sessionID=" + SessionID + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + pID);
             Web_PlaceOrder.Get();
-//            creditUpdateAfterBuy(Integer.parseInt(oldCredit), Integer.parseInt(price));
             creditUpdateAfterBuy(Double.parseDouble(oldCredit), Double.parseDouble(price));
         }
     }
@@ -230,128 +226,58 @@ public class Order extends Form implements HandlesEventDispatching {
         Double i = x - y;
         String p = Double.toString(i);
         LBL_CreditTXT.Text("€" + p);
-        Web_Credit2.Url(baseURL + "sessionID=" + SessionID + "&entity=person&method=PUT&pID=" + pID + "&Credit=" + p);
+        Web_Credit2.Url(getCreditURL+ "&Credit=" + p);
         Web_Credit2.Get();
     }
-
-    public void JsonSortThingsListView(String jsonString) {
-
-// for loop to sort by pID
-        String Temp1 = "";
-        //Used https://stackoverflow.com/questions/48449004/java-storing-the-output-of-a-for-loop-into-an-array/48449039 and https://www.w3schools.com/java/java_ref_string.asp
-        List<String> jsonIsMySon = new ArrayList<String>();
-        char start = '{';
-        char finish = '}';
-        int e = 0;
-        for (int i = 0; i < jsonString.length(); i++) {
-            char thisChar = jsonString.charAt(i);
-            if (thisChar == start) {
-
-                e = i + 1;
-            } else if ((thisChar == finish)) {
-                String Temp2 = jsonString.substring(e, i);
-                if (!(Temp2.contains("]"))) {
-                    if (Temp2.contains("tSoldBy\":\"")) {
-                        jsonIsMySon.add(Temp2);
-                    }
-                }
-            }
-
-        }
-
-//        LBL_AvToOrdr.Text(jsonIsMySon.get(1));
-
-//        String loge = "";
-        //For Loop to Rearrange Data To How I want
-        String Temp3 = "";
-        for (int a = 0; a < jsonIsMySon.size(); a++) {
-            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
-            String r2 = r1.replace(",", "-");
-            String[] keyValueArray = r2.split("<SPLIT>");
-            //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy
-            jsonIsMySon.set(a, "[" + keyValueArray[1] + ":" + keyValueArray[5] + "]" + keyValueArray[2] + "(" + keyValueArray[0] + ")€" + keyValueArray[4]);
-
-
-            if (a == 0) {
-                //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy  logetiddy
-//                String[] keyValueArray = r1.split(",");
-//                jsonIsMySon.set(a,"["+keyValueArray[2]+":"+keyValueArray[6]+"]"+keyValueArray[3]+"("+keyValueArray[1]+")€"+keyValueArray[5]);
-                Temp3 += jsonIsMySon.get(a);
-            } else {
-                //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy  logetiddy
-//                String[] keyValueArray = r1.split(",");
-//                jsonIsMySon.set(a,"["+keyValueArray[1]+":"+keyValueArray[5]+"]"+keyValueArray[2]+"("+keyValueArray[0]+")€"+keyValueArray[4]);
-                Temp3 += "," + jsonIsMySon.get(a);
-            }
-        }
-
-        //Format for use in listView-Remove KeyNames
-        String r2 = Temp3.replace("\":\"", "");
-        String r3 = r2.replace("\"tDescription", "");
-        String r4 = r3.replace("tID", "");
-        String r5 = r4.replace("tName", "");
-        String r6 = r5.replace("tPrice", "");
-        String r7 = r6.replace("tSoldBy", "");
-        String r8 = r7.replace("\"", "");
-
-        LST_ThingsA.ElementsFromString(r8);
-        // String y=jsonIsMySon.get(0);
-
-
-    }
-
     public void JsonCreditThings(String Y) {
         int start = Y.lastIndexOf("Credit") + 9;
         int finish = Y.lastIndexOf("Email") - 3;
         String Rep1 = Y.substring(start, finish);
         LBL_CreditTXT.Text("€" + Rep1);
     }
-
-    public void sortJsonShite(String jsonString) {
-        List<String> jsonIsMySon = new ArrayList<String>();
-        String Temp1 = "";
-        char start = '{';
-        char finish = '}';
-        int e = 0;
-        for (int i = 0; i < jsonString.length(); i++) {
-            char thisChar = jsonString.charAt(i);
-            if (thisChar == start) {
-                e = i + 1;
-            } else if ((thisChar == finish)) {
-                String Temp2 = jsonString.substring(e, i);
-                if (!(Temp2.contains("]"))) {
-                    if (Temp2.contains("buyerID\":\"" + pID)) {
-                        jsonIsMySon.add(Temp2);
+    public void jsonSortAndListViewForBuyerScreen(String status, String textOfResponse, String tableName, String fieldName) {
+        List<String> ListViewItemArray;
+        if (status.equals("200")) try {
+            ListViewItemArray = new ArrayList<String>();
+            // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
+            JSONObject parser = new JSONObject(textOfResponse);
+            if (!parser.getString(tableName).equals("")) {
+                JSONArray jsonIsMySon = parser.getJSONArray(tableName);
+                for (int i = 0; i < jsonIsMySon.length(); i++) {
+                    String oneEntryInTheListView = "";
+                    //add data from table to the sting above by getting the field name you want from the brief ( example where field name is "sellerID": oneEntryInTheListView = jsonIsMySon.getJSONObject(i).getString("sellerID"); )
+                    //formats entries the ListView containing the items in thing table
+                    if (tableName.equals("thing") && fieldName.equals("null")){
+                        oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("tID")
+                                + " : " + jsonIsMySon.getJSONObject(i).getString("tSoldBy")
+                                + "] " + jsonIsMySon.getJSONObject(i).getString("tName")
+                                + " (" + jsonIsMySon.getJSONObject(i).getString("tDescription")
+                                + ") €" + jsonIsMySon.getJSONObject(i).getString("tPrice");
+                        ListViewItemArray.add(oneEntryInTheListView);
+                    }
+                    //formats entries the ListView containing the orders buyer has placed
+                    else if ((tableName.equals("prettyorders") && fieldName.equals("buyerID")) && (Integer.valueOf(jsonIsMySon.getJSONObject(i).getString(fieldName)).equals( Integer.valueOf(pID)))) {
+                        oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("oID")
+                                + "] " + jsonIsMySon.getJSONObject(i).getString("tName")
+                                + " from " + jsonIsMySon.getJSONObject(i).getString("seller")
+                                + " [ tID: " + jsonIsMySon.getJSONObject(i).getString("tID") + " ]";
+                        ListViewItemArray.add(oneEntryInTheListView);
                     }
                 }
+                YailList tempData = YailList.makeList(ListViewItemArray);
+                if (tableName.equals("prettyorders") && fieldName.equals("buyerID")) {
+                    LST_ThingsO.Elements(tempData);
+                }
+                if (tableName.equals("thing") && fieldName.equals("null")) {
+                    LST_ThingsA.Elements(tempData);
+                }
             }
-
+        } catch (JSONException e) {
+            // if an exception occurs, code for it in here
+            messages.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
         }
-//        for (int a=0;a<jsonIsMySon.size();a++){
-//            Temp1+=jsonIsMySon.get(a)+"*-*";
-//        }
-//        String Loge="";
-
-        String Temp3 = "";
-        for (int a = 0; a < jsonIsMySon.size(); a++) {
-            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
-            String r2 = r1.replace(",", "-");
-            String[] keyValueArray = r2.split("<SPLIT>");
-            //Rearrange Json data [0]=buyerID,[1]=oID,[2]=seller name ,[3]=tID,[4]=tName-ItemName
-            jsonIsMySon.set(a, "[" + keyValueArray[1] + "] " + keyValueArray[4] + " from " + keyValueArray[2]);
-            if (a == 0) {
-                Temp3 += jsonIsMySon.get(a);
-            } else {
-                Temp3 += "," + jsonIsMySon.get(a);
-            }
+        else {
+            messages.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
         }
-
-        String r1 = Temp3.replace("\"", "");
-        String r2 = r1.replace(":", "");
-        String r3 = r2.replace("oID", "");
-        String r4 = r3.replace("tName", "");
-        String r5 = r4.replace("seller", "");
-        LST_ThingsO.ElementsFromString(r5);
     }
-
 }

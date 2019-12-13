@@ -1,5 +1,4 @@
 package net.fachtnaroe.red_bananas;
-//Test comment
 
 import android.content.Intent;
 
@@ -11,28 +10,28 @@ import com.google.appinventor.components.runtime.Form;
 import com.google.appinventor.components.runtime.HandlesEventDispatching;
 import com.google.appinventor.components.runtime.HorizontalArrangement;
 import com.google.appinventor.components.runtime.Label;
+import com.google.appinventor.components.runtime.Notifier;
 import com.google.appinventor.components.runtime.PasswordTextBox;
 import com.google.appinventor.components.runtime.TextBox;
 import com.google.appinventor.components.runtime.VerticalScrollArrangement;
 import com.google.appinventor.components.runtime.Web;
-import com.google.appinventor.components.runtime.Notifier;
 
 public class MainActivity extends Form implements HandlesEventDispatching {
 
-    private Label title, UserL,PasswL;
+    private Label title, UserL, PasswL;
     private TextBox username;
     private PasswordTextBox password;
-    private CheckBox buyer,seller;
+    private CheckBox buyer, seller;
     private Button login;
     private VerticalScrollArrangement Varr1;
-    private HorizontalArrangement Harr1,Harr2,Harr3,Harr4,Harr5;
-    private String Spass="",weblogin="https://fachtnaroe.net/bananas?cmd=LOGIN&user=",webLogin2="&pass=",ResonseContent;
+    private HorizontalArrangement Harr1, Harr2, Harr3, Harr4, Harr5;
+    private String Spass = "", weblogin = "https://fachtnaroe.net/bananas?cmd=LOGIN&user=", webLogin2 = "&pass=", ResonseContent;
     private Web webLoginConnection;
     private Notifier GotTextNotifier;
-    boolean buyerBool=false,salesBool=false;
-    private static String Suser="",SessionId="",pID="";
+    boolean buyerBool = false, salesBool = false;
+    private static String Suser = "", SessionId = "", pID = "";
 
-    protected void $define(){
+    protected void $define() {
         webLoginConnection = new Web(this);
         this.BackgroundColor(COLOR_PINK);
 
@@ -114,92 +113,85 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         login.TextColor(COLOR_PINK);
         login.BackgroundColor(COLOR_BLACK);
 
-        EventDispatcher.registerEventForDelegation( this, formName, "Click" );
-        EventDispatcher.registerEventForDelegation( this, formName, "GotText" );
-        EventDispatcher.registerEventForDelegation( this, "ChangedEvent", "Changed" );
+        EventDispatcher.registerEventForDelegation(this, formName, "Click");
+        EventDispatcher.registerEventForDelegation(this, formName, "GotText");
+        EventDispatcher.registerEventForDelegation(this, "ChangedEvent", "Changed");
     }
-    public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params)
-    {
-        if (eventName.equals("Click")){
-            if (component.equals(login))
-            {
+
+    public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
+        if (eventName.equals("Click")) {
+            if (component.equals(login)) {
                 loginBtnClick();
                 return true;
             }
         }
 
-        if( component.equals(buyer) && eventName.equals("Changed") ){
-            if(buyerBool){
-                buyerBool=false;
-            }
-            else {
-                buyerBool=true;
-            }
+        if (component.equals(buyer) && eventName.equals("Changed")) {
+            buyerBool = !buyerBool;
             return true;
         }
-        if( component.equals(seller) && eventName.equals("Changed") ){
-            if(salesBool){
-                salesBool=false;
-            }
-            else {
-                salesBool=true;
-            }
+        if (component.equals(seller) && eventName.equals("Changed")) {
+            salesBool = !salesBool;
             return true;
         }
-        if(eventName.equals("GotText")){
+        if (eventName.equals("GotText")) {
             sortJsonDeet(params);
             loginResult(params);
             return true;
         }
         return false;
     }
+
     public void loginBtnClick() {
-      if((salesBool&&buyerBool)||(!(salesBool||buyerBool))){
+        if ((salesBool && buyerBool) || (!(salesBool || buyerBool))) {
             GotTextNotifier.ShowAlert("Check ONE box");
-        }
-        else {
+        } else {
             Suser = username.Text();
             Spass = password.Text();
             webLoginConnection.Url(weblogin + Suser + webLogin2 + Spass);
             webLoginConnection.Get();
         }
     }
-    public  void loginResult(Object[] params){
-        ResonseContent=(String) params[3];
-        if(ResonseContent.contains("OK")){
+
+    public void loginResult(Object[] params) {
+        ResonseContent = (String) params[3];
+        if (ResonseContent.contains("OK")) {
             GotTextNotifier.ShowAlert("OK");
             this.BackgroundColor(COLOR_GREEN);
             NextPlaceGo();
-        }
-        else{
+        } else {
             GotTextNotifier.ShowAlert("Nuh uh");
             this.BackgroundColor(COLOR_RED);
         }
     }
+
     public void NextPlaceGo() {
-        if(salesBool&&!buyerBool){
+        if (salesBool && !buyerBool) {
             Intent i = new Intent(getApplicationContext(), Sales.class);
             startActivity(i);
-        }
-        else if(!salesBool&&buyerBool){
+        } else if (!salesBool && buyerBool) {
             Intent i = new Intent(getApplicationContext(), Order.class);
             startActivity(i);
         }
     }
-    public void sortJsonDeet(Object[] params){
-        String jsonString = (String)params[3];;
-        int sessionIDFirstChar =(jsonString.indexOf("sessionID"))+12;
-        int pID_FirstChar = (jsonString.indexOf("pID"))+8;
-        SessionId=jsonString.substring(sessionIDFirstChar,sessionIDFirstChar+8);
-        pID=jsonString.substring(pID_FirstChar,pID_FirstChar+2);
+
+    public void sortJsonDeet(Object[] params) {
+        String jsonString = (String) params[3];
+        int sessionIDFirstChar = (jsonString.indexOf("sessionID")) + 12;
+        int pID_FirstChar = (jsonString.indexOf("pID")) + 8;
+        SessionId = jsonString.substring(sessionIDFirstChar, sessionIDFirstChar + 8);
+        pID = jsonString.substring(pID_FirstChar, pID_FirstChar + 2);
     }
-    public static String getUsername(){
+
+    public static String getUsername() {
         return Suser;
     }
-    public static String getSessionID(){
+
+    public static String getSessionID() {
         return SessionId;
     }
-    public static String getPID(){
+
+    public static String getPID() {
         return pID;
     }
 }

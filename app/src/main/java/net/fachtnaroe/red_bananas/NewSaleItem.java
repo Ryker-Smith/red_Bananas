@@ -14,20 +14,18 @@ import com.google.appinventor.components.runtime.TextBox;
 import com.google.appinventor.components.runtime.VerticalScrollArrangement;
 import com.google.appinventor.components.runtime.Web;
 
-import javax.xml.validation.Validator;
-
 public class NewSaleItem extends Form implements HandlesEventDispatching {
     private Button butt1;//Delete Later
     private VerticalScrollArrangement VArr;
     private HorizontalArrangement HArr_Price;
     private Button saveThisBtn;
-    private TextBox nameTxtBox,descriptionTxtBox,priceTxtBox;
-    private Label nameLabel,descriptionLabel,priceLabel,euroSymbolLablel,titleLabel;
+    private TextBox nameTxtBox, descriptionTxtBox, priceTxtBox;
+    private Label nameLabel, descriptionLabel, priceLabel, euroSymbolLablel, titleLabel;
     private Web webSaveNewItem;
     private Notifier savedNotifier;
-    private String  baseURL ="https://fachtnaroe.net/bananas?",
-            pID =MainActivity.getPID(),
-            sessionID=MainActivity.getSessionID();
+    private String baseURL = "https://fachtnaroe.net/bananas?",
+            pID = MainActivity.getPID(),
+            sessionID = MainActivity.getSessionID();
 
     protected void $define() {
         VArr = new VerticalScrollArrangement(this);
@@ -80,38 +78,40 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
 
         savedNotifier = new Notifier(this);
 
-        EventDispatcher.registerEventForDelegation( this, formName, "Click" );
-        EventDispatcher.registerEventForDelegation( this, formName, "GotText" );
+        EventDispatcher.registerEventForDelegation(this, formName, "Click");
+        EventDispatcher.registerEventForDelegation(this, formName, "GotText");
     }
-    public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params){
-        if (eventName.equals("Click")){
-            if(component.equals((butt1))) {
+
+    public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
+        if (eventName.equals("Click")) {
+            if (component.equals((butt1))) {
                 SalesGo();
                 return true;
             }
-            if(component.equals((saveThisBtn))) {
+            if (component.equals((saveThisBtn))) {
                 saveThis();
                 return true;
             }
             return true;
         }
-        if (eventName.equals("GotText")){
-            titleLabel.Text((String)params[3]);
+        if (eventName.equals("GotText")) {
+            titleLabel.Text((String) params[3]);
             nameLabel.Text("Saved?");
             savedNotifier.ShowAlert("Item has been saved");
             SalesGo();
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
-    public void saveThis(){
-        webSaveNewItem.Url(baseURL+"sessionID="+sessionID+"&method=POST&entity=thing&tName="+nameTxtBox.Text()+"&tDescription="+descriptionTxtBox.Text()+"&tPrice="+priceTxtBox.Text()+"&tSoldBy="+pID);
+
+    public void saveThis() {
+        webSaveNewItem.Url(baseURL + "sessionID=" + sessionID + "&method=POST&entity=thing&tName=" + nameTxtBox.Text() + "&tDescription=" + descriptionTxtBox.Text() + "&tPrice=" + priceTxtBox.Text() + "&tSoldBy=" + pID);
         webSaveNewItem.Get();
     }
-    public void SalesGo(){
-        Intent i = new Intent(getApplicationContext(),Sales.class);
+
+    public void SalesGo() {
+        Intent i = new Intent(getApplicationContext(), Sales.class);
         startActivity(i);
     }
 }

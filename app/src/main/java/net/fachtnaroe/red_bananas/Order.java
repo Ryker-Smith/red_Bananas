@@ -1,21 +1,17 @@
 package net.fachtnaroe.red_bananas;
 
-import android.provider.ContactsContract;
-
-import androidx.core.view.KeyEventDispatcher;
-
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.EventDispatcher;
+import com.google.appinventor.components.runtime.File;
 import com.google.appinventor.components.runtime.Form;
 import com.google.appinventor.components.runtime.HandlesEventDispatching;
-import com.google.appinventor.components.runtime.Label;
-import com.google.appinventor.components.runtime.VerticalScrollArrangement;
 import com.google.appinventor.components.runtime.HorizontalArrangement;
+import com.google.appinventor.components.runtime.Label;
 import com.google.appinventor.components.runtime.ListView;
-import com.google.appinventor.components.runtime.Web;
-import com.google.appinventor.components.runtime.File;
 import com.google.appinventor.components.runtime.Notifier;
+import com.google.appinventor.components.runtime.VerticalScrollArrangement;
+import com.google.appinventor.components.runtime.Web;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +26,9 @@ public class Order extends Form implements HandlesEventDispatching {
     private String baseURL = "https://fachtnaroe.net/bananas?",
             SessionID = MainActivity.getSessionID(),
             pID = MainActivity.getPID(),
-            username=MainActivity.getUsername(),
-            getCreditURL=baseURL+"sessionID="+ SessionID + "&entity=person&method=GET&pID="+ pID;
-    private Web Web_TfS, Web_TB,Web_Credit,Web_Credit2,Web_PlaceOrder;
+            username = MainActivity.getUsername(),
+            getCreditURL = baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID;
+    private Web Web_TfS, Web_TB, Web_Credit, Web_Credit2, Web_PlaceOrder;
     private File FileDBS;
     private Notifier messages;
     private Double newCredit;
@@ -115,6 +111,7 @@ public class Order extends Form implements HandlesEventDispatching {
 
         LST_ThingsA = new ListView(HArr4);
         LST_ThingsA.WidthPercent(100);
+        LST_ThingsA.TextSize(35);
 
         LST_ThingsA.TextColor(Component.COLOR_ORANGE);
 
@@ -144,6 +141,7 @@ public class Order extends Form implements HandlesEventDispatching {
         LST_ThingsO = new ListView(HArr7);
         LST_ThingsO.WidthPercent(100);
         LST_ThingsO.TextColor(Component.COLOR_WHITE);
+        LST_ThingsO.TextSize(35);
 
         messages = new Notifier(this);
         messages.BackgroundColor(Component.COLOR_RED);
@@ -157,17 +155,17 @@ public class Order extends Form implements HandlesEventDispatching {
         Web_TB.Url(baseURL + "sessionID=" + SessionID + "&entity=prettyorders&method=GET");
         Web_TB.Get();
 
-        Web_Credit= new Web(this);
-        Web_Credit.Url(baseURL+"sessionID="+ SessionID + "&entity=person&method=GET&pID="+ pID);
+        Web_Credit = new Web(this);
+        Web_Credit.Url(baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID);
         Web_Credit.Get();
 
-        Web_Credit2= new Web(this);
+        Web_Credit2 = new Web(this);
 
-        Web_PlaceOrder= new Web(this);
+        Web_PlaceOrder = new Web(this);
 
         EventDispatcher.registerEventForDelegation(this, formName, "Click");
         EventDispatcher.registerEventForDelegation(this, formName, "Initialize");
-        EventDispatcher.registerEventForDelegation(this, "GotTextEvent", "GotText" );
+        EventDispatcher.registerEventForDelegation(this, "GotTextEvent", "GotText");
     }
 
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
@@ -185,7 +183,7 @@ public class Order extends Form implements HandlesEventDispatching {
         }
         if (component.equals(Web_TB) && eventName.equals("GotText")
         ) {
-            sortJsonShite((String)params[3]);
+            sortJsonShite((String) params[3]);
             return true;
         }
         if (component.equals(Web_Credit) && eventName.equals("GotText")) {
@@ -193,47 +191,49 @@ public class Order extends Form implements HandlesEventDispatching {
             return true;
         }
         if (component.equals(Web_PlaceOrder) && eventName.equals("GotText")) {
-            String response=((String) params[3]);
-            if(response.contains("OK")){
-                String oid =response.substring(22,response.length()-2);
-                messages.ShowAlert("Your Order Has Been Placed : "+oid);
+            String response = ((String) params[3]);
+            if (response.contains("OK")) {
+                String oid = response.substring(22, response.length() - 2);
+                messages.ShowAlert("Your Order Has Been Placed : " + oid);
 
             }
             return true;
         }
         return false;
     }
+
     public void buyThis(String x) {
-        if((LST_ThingsA.Selection().isEmpty())) {
+        if ((LST_ThingsA.Selection().isEmpty())) {
             messages.ShowAlert("No Item Selected");
-        }
-        else {
+        } else {
             int i = x.indexOf("]");
-            int euro = x.indexOf("€")+1;
-            String price =x.substring(euro,x.length());
+            int euro = x.indexOf("€") + 1;
+            String price = x.substring(euro);
 
 
-            String oldCredit = LBL_CreditTXT.Text().replace("€","");
+            String oldCredit = LBL_CreditTXT.Text().replace("€", "");
 //            newCredit=Double.parseDouble(oldCredit)-Double.parseDouble(price);
 //            String s=Double
 //            LBL_Ordered.Text(Double.toString(newCredit));
 //            LBL_CreditTXT.Text("€"+newCredit);
 //            LBL_Ordered.Text(oldCredit+" "+price);
-            String y = x.substring(1,i);
-            String[] url_IDs =y.split(":");
-            Web_PlaceOrder.Url(baseURL+"sessionID="+SessionID+"&entity=orders&method=POST&tID="+url_IDs[0]+"&sellerID="+url_IDs[1]+"&slotNum=1&buyerID="+pID);
+            String y = x.substring(1, i);
+            String[] url_IDs = y.split(":");
+            Web_PlaceOrder.Url(baseURL + "sessionID=" + SessionID + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + pID);
             Web_PlaceOrder.Get();
 //            creditUpdateAfterBuy(Integer.parseInt(oldCredit), Integer.parseInt(price));
             creditUpdateAfterBuy(Double.parseDouble(oldCredit), Double.parseDouble(price));
         }
     }
-    public void creditUpdateAfterBuy(Double x, Double y){
-       Double i = x-y;
-       String p = Double.toString(i);
-        LBL_CreditTXT.Text("€"+p);
-        Web_Credit2.Url(baseURL+"sessionID="+ SessionID + "&entity=person&method=PUT&pID="+ pID+"&Credit="+p);
+
+    public void creditUpdateAfterBuy(Double x, Double y) {
+        Double i = x - y;
+        String p = Double.toString(i);
+        LBL_CreditTXT.Text("€" + p);
+        Web_Credit2.Url(baseURL + "sessionID=" + SessionID + "&entity=person&method=PUT&pID=" + pID + "&Credit=" + p);
         Web_Credit2.Get();
     }
+
     public void JsonSortThingsListView(String jsonString) {
 
 // for loop to sort by pID
@@ -247,11 +247,10 @@ public class Order extends Form implements HandlesEventDispatching {
             char thisChar = jsonString.charAt(i);
             if (thisChar == start) {
 
-                e = i+1;
-            }
-            else if ((thisChar == finish)) {
-                String Temp2 = jsonString.substring(e, i);;
-                if (!(Temp2.contains("]"))){
+                e = i + 1;
+            } else if ((thisChar == finish)) {
+                String Temp2 = jsonString.substring(e, i);
+                if (!(Temp2.contains("]"))) {
                     if (Temp2.contains("tSoldBy\":\"")) {
                         jsonIsMySon.add(Temp2);
                     }
@@ -264,64 +263,63 @@ public class Order extends Form implements HandlesEventDispatching {
 
 //        String loge = "";
         //For Loop to Rearrange Data To How I want
-        String Temp3="";
-        for (int a=0;a<jsonIsMySon.size();a++){
+        String Temp3 = "";
+        for (int a = 0; a < jsonIsMySon.size(); a++) {
             String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
             String r2 = r1.replace(",", "-");
             String[] keyValueArray = r2.split("<SPLIT>");
             //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy
-            jsonIsMySon.set(a,"["+keyValueArray[1]+":"+keyValueArray[5]+"]"+keyValueArray[2]+"("+keyValueArray[0]+")€"+keyValueArray[4]);
+            jsonIsMySon.set(a, "[" + keyValueArray[1] + ":" + keyValueArray[5] + "]" + keyValueArray[2] + "(" + keyValueArray[0] + ")€" + keyValueArray[4]);
 
 
-            if(a==0){
+            if (a == 0) {
                 //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy  logetiddy
 //                String[] keyValueArray = r1.split(",");
 //                jsonIsMySon.set(a,"["+keyValueArray[2]+":"+keyValueArray[6]+"]"+keyValueArray[3]+"("+keyValueArray[1]+")€"+keyValueArray[5]);
-                Temp3+=jsonIsMySon.get(a);
-            }
-            else{
+                Temp3 += jsonIsMySon.get(a);
+            } else {
                 //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy  logetiddy
 //                String[] keyValueArray = r1.split(",");
 //                jsonIsMySon.set(a,"["+keyValueArray[1]+":"+keyValueArray[5]+"]"+keyValueArray[2]+"("+keyValueArray[0]+")€"+keyValueArray[4]);
-                Temp3+=","+jsonIsMySon.get(a);
+                Temp3 += "," + jsonIsMySon.get(a);
             }
         }
 
         //Format for use in listView-Remove KeyNames
-        String r2 = Temp3.replace("\":\"","");
-        String r3 = r2.replace("\"tDescription","");
-        String r4 = r3.replace("tID","");
-        String r5 = r4.replace("tName","");
-        String r6 = r5.replace("tPrice","");
-        String r7 = r6.replace("tSoldBy","");
-        String r8 = r7.replace("\"","");
+        String r2 = Temp3.replace("\":\"", "");
+        String r3 = r2.replace("\"tDescription", "");
+        String r4 = r3.replace("tID", "");
+        String r5 = r4.replace("tName", "");
+        String r6 = r5.replace("tPrice", "");
+        String r7 = r6.replace("tSoldBy", "");
+        String r8 = r7.replace("\"", "");
 
         LST_ThingsA.ElementsFromString(r8);
-       // String y=jsonIsMySon.get(0);
+        // String y=jsonIsMySon.get(0);
 
 
     }
+
     public void JsonCreditThings(String Y) {
-        int start = Y.lastIndexOf("Credit")+9;
-        int finish = Y.lastIndexOf("Email")-3;
-        String Rep1 = Y.substring(start,finish);
-        LBL_CreditTXT.Text("€"+Rep1);
+        int start = Y.lastIndexOf("Credit") + 9;
+        int finish = Y.lastIndexOf("Email") - 3;
+        String Rep1 = Y.substring(start, finish);
+        LBL_CreditTXT.Text("€" + Rep1);
     }
 
-    public void sortJsonShite(String jsonString){
+    public void sortJsonShite(String jsonString) {
         List<String> jsonIsMySon = new ArrayList<String>();
         String Temp1 = "";
         char start = '{';
         char finish = '}';
         int e = 0;
-        for     (int i = 0; i < jsonString.length(); i++) {
+        for (int i = 0; i < jsonString.length(); i++) {
             char thisChar = jsonString.charAt(i);
             if (thisChar == start) {
-                e = i+1;
-            }
-            else if ((thisChar == finish)) {
+                e = i + 1;
+            } else if ((thisChar == finish)) {
                 String Temp2 = jsonString.substring(e, i);
-                if (!(Temp2.contains("]"))){
+                if (!(Temp2.contains("]"))) {
                     if (Temp2.contains("buyerID\":\"" + pID)) {
                         jsonIsMySon.add(Temp2);
                     }
@@ -334,18 +332,17 @@ public class Order extends Form implements HandlesEventDispatching {
 //        }
 //        String Loge="";
 
-        String Temp3="";
-        for (int a=0;a<jsonIsMySon.size();a++){
+        String Temp3 = "";
+        for (int a = 0; a < jsonIsMySon.size(); a++) {
             String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
             String r2 = r1.replace(",", "-");
             String[] keyValueArray = r2.split("<SPLIT>");
             //Rearrange Json data [0]=buyerID,[1]=oID,[2]=seller name ,[3]=tID,[4]=tName-ItemName
-             jsonIsMySon.set(a,"["+keyValueArray[1]+"] "+keyValueArray[4]+" from "+keyValueArray[2]);
-            if(a==0){
-                Temp3+=jsonIsMySon.get(a);
-            }
-            else{
-                Temp3+=","+jsonIsMySon.get(a);
+            jsonIsMySon.set(a, "[" + keyValueArray[1] + "] " + keyValueArray[4] + " from " + keyValueArray[2]);
+            if (a == 0) {
+                Temp3 += jsonIsMySon.get(a);
+            } else {
+                Temp3 += "," + jsonIsMySon.get(a);
             }
         }
 

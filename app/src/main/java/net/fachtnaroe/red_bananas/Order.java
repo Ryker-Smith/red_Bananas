@@ -1,11 +1,8 @@
 package net.fachtnaroe.red_bananas;
 
-import android.util.Log;
-
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.EventDispatcher;
-import com.google.appinventor.components.runtime.File;
 import com.google.appinventor.components.runtime.Form;
 import com.google.appinventor.components.runtime.HandlesEventDispatching;
 import com.google.appinventor.components.runtime.HorizontalArrangement;
@@ -29,7 +26,7 @@ public class Order extends Form implements HandlesEventDispatching {
     private VerticalScrollArrangement VArr;
     private Label LBL_Title, LBL_UserN, LBL_UserTXT, LBL_pID, LBL_pIDTXT, LBL_AvToOrdr, LBL_Credit, LBL_CreditTXT, LBL_Ordered;
     private HorizontalArrangement HArr1, HArr2, HArr3, HArr4, HArr5, HArr6, HArr7;
-    private ListView LST_ThingsA, LST_ThingsO, LST_Temp;
+    private ListView ThingsAvailableToBuy_ListView, ThingsOrdered_ListView, LST_Temp;
     private String baseURL = "https://fachtnaroe.net/bananas?",
             SessionID = MainActivity.getSessionID(),
             pID = MainActivity.getPID(),
@@ -113,11 +110,10 @@ public class Order extends Form implements HandlesEventDispatching {
         LBL_AvToOrdr.Text("Things Available For Purchase:");
         LBL_AvToOrdr.TextColor(Component.COLOR_ORANGE);
 
-        LST_ThingsA = new ListView(HArr4);
-        LST_ThingsA.WidthPercent(100);
-        LST_ThingsA.TextSize(35);
-
-        LST_ThingsA.TextColor(Component.COLOR_ORANGE);
+        ThingsAvailableToBuy_ListView = new ListView(HArr4);
+        ThingsAvailableToBuy_ListView.WidthPercent(100);
+        ThingsAvailableToBuy_ListView.TextSize(35);
+        ThingsAvailableToBuy_ListView.TextColor(Component.COLOR_ORANGE);
 
         LBL_Credit = new Label(HArr5);
         LBL_Credit.FontSize(16);
@@ -142,10 +138,10 @@ public class Order extends Form implements HandlesEventDispatching {
         LBL_Ordered.Text("Things I've Ordered:");
         LBL_Ordered.TextColor(Component.COLOR_ORANGE);
 
-        LST_ThingsO = new ListView(HArr7);
-        LST_ThingsO.WidthPercent(100);
-        LST_ThingsO.TextColor(Component.COLOR_WHITE);
-        LST_ThingsO.TextSize(35);
+        ThingsOrdered_ListView = new ListView(HArr7);
+        ThingsOrdered_ListView.WidthPercent(100);
+        ThingsOrdered_ListView.TextColor(Component.COLOR_WHITE);
+        ThingsOrdered_ListView.TextSize(35);
 
         messages = new Notifier(this);
         messages.BackgroundColor(Component.COLOR_RED);
@@ -175,18 +171,19 @@ public class Order extends Form implements HandlesEventDispatching {
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
         if (eventName.equals("Click")) {
             if (component.equals(BTN_BuyItem)) {
-                buyThis(LST_ThingsA.Selection());
+                buyThis(ThingsAvailableToBuy_ListView.Selection());
                 return true;
             } else {
                 return false;
             }
         }
         if (component.equals(Web_TfS) && eventName.equals("GotText")) {
+            //calling the procedure For the ListView containing the Items that are available to buy
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"thing", "null");
             return true;
         }
-        if (component.equals(Web_TB) && eventName.equals("GotText")
-        ) {
+        if (component.equals(Web_TB) && eventName.equals("GotText")) {
+            //calling the procedure For the ListView containing the Items that the buyer has ordered
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"prettyorders", "buyerID");
             return true;
         }
@@ -207,7 +204,7 @@ public class Order extends Form implements HandlesEventDispatching {
     }
 
     public void buyThis(String x) {
-        if ((LST_ThingsA.Selection().isEmpty())) {
+        if ((ThingsAvailableToBuy_ListView.Selection().isEmpty())) {
             messages.ShowAlert("No Item Selected");
         } else {
             int i = x.indexOf("]");
@@ -221,7 +218,6 @@ public class Order extends Form implements HandlesEventDispatching {
             creditUpdateAfterBuy(Double.parseDouble(oldCredit), Double.parseDouble(price));
         }
     }
-
     public void creditUpdateAfterBuy(Double x, Double y) {
         Double i = x - y;
         String p = Double.toString(i);
@@ -235,6 +231,7 @@ public class Order extends Form implements HandlesEventDispatching {
         String Rep1 = Y.substring(start, finish);
         LBL_CreditTXT.Text("€" + Rep1);
     }
+    //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
     public void jsonSortAndListViewForBuyerScreen(String status, String textOfResponse, String tableName, String fieldName) {
         List<String> ListViewItemArray;
         if (status.equals("200")) try {
@@ -266,10 +263,10 @@ public class Order extends Form implements HandlesEventDispatching {
                 }
                 YailList tempData = YailList.makeList(ListViewItemArray);
                 if (tableName.equals("prettyorders") && fieldName.equals("buyerID")) {
-                    LST_ThingsO.Elements(tempData);
+                    ThingsOrdered_ListView.Elements(tempData);
                 }
                 if (tableName.equals("thing") && fieldName.equals("null")) {
-                    LST_ThingsA.Elements(tempData);
+                    ThingsAvailableToBuy_ListView.Elements(tempData);
                 }
             }
         } catch (JSONException e) {

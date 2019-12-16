@@ -1,6 +1,7 @@
 package net.fachtnaroe.red_bananas;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
@@ -177,7 +178,8 @@ public class Order extends Form implements HandlesEventDispatching {
             return true;
         }
         if (component.equals(Web_Credit) && eventName.equals("GotText")) {
-            JsonCreditThings((String) params[3]);
+            Log.w("TIN**",(String) params[3]);
+            JsonCreditThings(params[1].toString(), (String) params[3]);
             return true;
         }
         if (component.equals(Web_PlaceOrder) && eventName.equals("GotText")) {
@@ -214,11 +216,28 @@ public class Order extends Form implements HandlesEventDispatching {
         Web_Credit2.Url(getCreditURL+ "&Credit=" + p);
         Web_Credit2.Get();
     }
-    public void JsonCreditThings(String Y) {
-        int start = Y.lastIndexOf("Credit") + 9;
-        int finish = Y.lastIndexOf("Email") - 3;
-        String Rep1 = Y.substring(start, finish);
-        LBL_CreditTXT.Text("€" + Rep1);
+    public void JsonCreditThings(String status, String textOfResponse) {
+//        int start = Y.lastIndexOf("Credit") + 9;
+//        int finish = Y.lastIndexOf("Email") - 3;
+//        String Rep1 = Y.substring(start, finish);
+
+        Log.w("personTING**","1");
+        if (status.equals("200")) try {
+            Log.w("personTING**","2");
+            JSONObject parser = new JSONObject(textOfResponse);
+            String bean = parser.getString("person");
+            Log.w("personTING**",parser.getString("person"));
+            //JSONObject credit =
+
+            //LBL_CreditTXT.Text("€" + parser.getString("Credit"));
+    } catch (JSONException e) {
+        // if an exception occurs, code for it in here
+        messages.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
+    }
+        else {
+        messages.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
+    }
+
     }
     //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
     public void jsonSortAndListViewForBuyerScreen(String status, String textOfResponse, String tableName, String fieldName) {

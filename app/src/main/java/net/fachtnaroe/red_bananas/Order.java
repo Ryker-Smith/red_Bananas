@@ -27,7 +27,7 @@ import java.util.List;
 public class Order extends Form implements HandlesEventDispatching {
     private Button BTN_BuyItem;
     private VerticalArrangement VArr;
-    private Label LBL_Title, LBL_UserN, LBL_UserTXT, LBL_pID, LBL_pIDTXT, LBL_AvToOrdr, LBL_Credit, LBL_CreditTXT, LBL_Ordered;
+    private Label LBL_Title, LBL_UserN, LBL_UserTXT, LBL_pID, LBL_pIDTXT, LBL_AvToOrdr, LBL_Credit, CreditAmount_Label, LBL_Ordered;
     private HorizontalArrangement HArr_UserInfo, HArr_Credit_BuyBtn, Harr_Credit, Harr_BuyBtn;
     private ListView ThingsAvailableToBuy_ListView, ThingsOrdered_ListView;
     private String baseURL = "https://fachtnaroe.net/bananas?",
@@ -115,11 +115,11 @@ public class Order extends Form implements HandlesEventDispatching {
         LBL_Credit.Text("Credit ");
         LBL_Credit.BackgroundColor(Component.COLOR_NONE);
 
-        LBL_CreditTXT = new Label(Harr_Credit);
-        LBL_CreditTXT.FontSize(20);
-        LBL_CreditTXT.TextColor(Component.COLOR_BLACK);
-        LBL_CreditTXT.Width(LENGTH_FILL_PARENT);
-        LBL_CreditTXT.BackgroundColor(Component.COLOR_NONE);
+        CreditAmount_Label = new Label(Harr_Credit);
+        CreditAmount_Label.FontSize(20);
+        CreditAmount_Label.TextColor(Component.COLOR_BLACK);
+        CreditAmount_Label.Width(LENGTH_FILL_PARENT);
+        CreditAmount_Label.BackgroundColor(Component.COLOR_NONE);
 
         Harr_BuyBtn = new HorizontalArrangement(HArr_Credit_BuyBtn);
         Harr_BuyBtn.Width(LENGTH_FILL_PARENT);
@@ -193,7 +193,8 @@ public class Order extends Form implements HandlesEventDispatching {
         }
         if (component.equals(Web_Credit) && eventName.equals("GotText")) {
             Log.w("TIN**",(String) params[3]);
-            JsonCreditThings(params[1].toString(), (String) params[3]);
+            //JsonCreditThings(params[1].toString(), (String) params[3]);
+            jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"person", "Credit");
             return true;
         }
         if (component.equals(Web_PlaceOrder) && eventName.equals("GotText")) {
@@ -215,7 +216,7 @@ public class Order extends Form implements HandlesEventDispatching {
             int i = x.indexOf("]");
             int euro = x.indexOf("€") + 1;
             String price = x.substring(euro);
-            String oldCredit = LBL_CreditTXT.Text().replace("€", "");
+            String oldCredit = CreditAmount_Label.Text().replace("€", "");
             String y = x.substring(1, i);
             String[] url_IDs = y.split(":");
             Web_PlaceOrder.Url(baseURL + "sessionID=" + SessionID + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + pID);
@@ -226,32 +227,9 @@ public class Order extends Form implements HandlesEventDispatching {
     public void creditUpdateAfterBuy(Double x, Double y) {
         Double i = x - y;
         String p = Double.toString(i);
-        LBL_CreditTXT.Text("€" + p);
+        CreditAmount_Label.Text("€" + p);
         Web_Credit2.Url(getCreditURL+ "&Credit=" + p);
         Web_Credit2.Get();
-    }
-    public void JsonCreditThings(String status, String textOfResponse) {
-//        int start = Y.lastIndexOf("Credit") + 9;
-//        int finish = Y.lastIndexOf("Email") - 3;
-//        String Rep1 = Y.substring(start, finish);
-
-        Log.w("personTING**","1");
-        if (status.equals("200")) try {
-            Log.w("personTING**","2");
-            JSONObject parser = new JSONObject(textOfResponse);
-            String bean = parser.getString("person");
-            Log.w("personTING**",parser.getString("person"));
-            //JSONObject credit =
-
-            //LBL_CreditTXT.Text("€" + parser.getString("Credit"));
-    } catch (JSONException e) {
-        // if an exception occurs, code for it in here
-        messages.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
-    }
-        else {
-        messages.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
-    }
-
     }
     //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
     public void jsonSortAndListViewForBuyerScreen(String status, String textOfResponse, String tableName, String fieldName) {
@@ -266,6 +244,10 @@ public class Order extends Form implements HandlesEventDispatching {
                     String oneEntryInTheListView = "";
                     //add data from table to the sting above by getting the field name you want from the brief ( example where field name is "sellerID": oneEntryInTheListView = jsonIsMySon.getJSONObject(i).getString("sellerID"); )
                     //formats entries the ListView containing the items in thing table
+                    if(tableName.equals("person") && fieldName.equals("Credit")){
+                        oneEntryInTheListView = jsonIsMySon.getJSONObject(i).getString("Credit");
+                        ListViewItemArray.add(oneEntryInTheListView);
+                    }
                     if (tableName.equals("thing") && fieldName.equals("null")){
                         oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("tID")
                                 + " : " + jsonIsMySon.getJSONObject(i).getString("tSoldBy")
@@ -284,6 +266,9 @@ public class Order extends Form implements HandlesEventDispatching {
                     }
                 }
                 YailList tempData = YailList.makeList(ListViewItemArray);
+                if(tableName.equals("person") && fieldName.equals("Credit")){
+                    CreditAmount_Label.Text("€" + tempData.get(1));
+                }
                 if (tableName.equals("prettyorders") && fieldName.equals("buyerID")) {
                     ThingsOrdered_ListView.Elements(tempData);
                 }

@@ -39,11 +39,12 @@ public class Order extends Form implements HandlesEventDispatching {
     private Notifier messages;
 
     protected void $define() {
+        this.BackgroundColor(Component.COLOR_ORANGE);
         VArr = new VerticalArrangement(this);
         VArr.Height(LENGTH_FILL_PARENT);
         VArr.Width(LENGTH_FILL_PARENT);
-        VArr.BackgroundColor(Component.COLOR_BLUE);
-
+        VArr.BackgroundColor(Component.COLOR_ORANGE);
+        VArr.Image("FDS_PossibleLogo_03.png");
         LBL_Title = new Label(VArr);
         LBL_Title.Width(LENGTH_FILL_PARENT);
         LBL_Title.FontSize(20);
@@ -51,70 +52,79 @@ public class Order extends Form implements HandlesEventDispatching {
         LBL_Title.Text("Food Delivery Service");
         LBL_Title.TextColor(Component.COLOR_WHITE);
         LBL_Title.TextAlignment(Component.ALIGNMENT_CENTER);
+        LBL_Title.BackgroundColor(Color.parseColor("#005200"));
 
         HArr_UserInfo = new HorizontalArrangement(VArr);
         HArr_UserInfo.Width(LENGTH_FILL_PARENT);
         HArr_UserInfo.HeightPercent(5);
-        HArr_UserInfo.BackgroundColor(Component.COLOR_GRAY);
+        HArr_UserInfo.BackgroundColor(Component.COLOR_NONE);
 
         LBL_UserN = new Label(HArr_UserInfo);
         LBL_UserN.FontSize(15);
         LBL_UserN.Text("Username:");
-        LBL_UserN.TextColor(Component.COLOR_WHITE);
+        LBL_UserN.TextColor(Component.COLOR_BLACK);
 
         LBL_UserTXT = new Label(HArr_UserInfo);
         LBL_UserTXT.Width(LENGTH_FILL_PARENT);
         LBL_UserTXT.FontSize(15);
         LBL_UserTXT.Text(username);
         LBL_UserTXT.TextColor(COLOR_RED);
+        LBL_UserTXT.FontBold(true);
 
         LBL_pID = new Label(HArr_UserInfo);
         LBL_pID.FontSize(15);
         LBL_pID.Text("pID:");
-        LBL_pID.TextColor(Component.COLOR_WHITE);
+        LBL_pID.TextColor(Component.COLOR_BLACK);
 
         LBL_pIDTXT = new Label(HArr_UserInfo);
         LBL_pIDTXT.FontSize(15);
         LBL_pIDTXT.Text(pID);
         LBL_pIDTXT.TextColor(COLOR_RED);
+        LBL_pIDTXT.FontBold(true);
 
         LBL_AvToOrdr = new Label(VArr);
         LBL_AvToOrdr.Width(LENGTH_FILL_PARENT);
-        LBL_AvToOrdr.FontSize(14);
+        LBL_AvToOrdr.FontSize(12);
         LBL_AvToOrdr.Text("Things Available For Purchase:");
         LBL_AvToOrdr.TextColor(Component.COLOR_WHITE);
+        LBL_AvToOrdr.FontItalic(true);
+        LBL_AvToOrdr.BackgroundColor(Color.parseColor("#005200"));
 
         ThingsAvailableToBuy_ListView = new ListView(VArr);
         ThingsAvailableToBuy_ListView.Width(LENGTH_FILL_PARENT);
         ThingsAvailableToBuy_ListView.Height(LENGTH_FILL_PARENT);
-        ThingsAvailableToBuy_ListView.TextSize(20);
-        ThingsAvailableToBuy_ListView.TextColor(Component.COLOR_WHITE);
+        ThingsAvailableToBuy_ListView.TextSize(50);
+        ThingsAvailableToBuy_ListView.TextColor(Component.COLOR_BLACK);
+        ThingsAvailableToBuy_ListView.SelectionColor(Color.parseColor("#009F00"));
+        ThingsAvailableToBuy_ListView.BackgroundColor(Component.COLOR_NONE);
 
         HArr_Credit_BuyBtn = new HorizontalArrangement(VArr);
         HArr_Credit_BuyBtn.Width(LENGTH_FILL_PARENT);
         HArr_Credit_BuyBtn.HeightPercent(7);
-        HArr_Credit_BuyBtn.BackgroundColor(Component.COLOR_GRAY);
+        HArr_Credit_BuyBtn.BackgroundColor(Component.COLOR_NONE);
 
         Harr_Credit = new HorizontalArrangement(HArr_Credit_BuyBtn);
         Harr_Credit.Width(LENGTH_FILL_PARENT);
         Harr_Credit.HeightPercent(7);
-        Harr_Credit.BackgroundColor(Component.COLOR_GRAY);
+        Harr_Credit.BackgroundColor(Component.COLOR_NONE);
 
         LBL_Credit = new Label(Harr_Credit);
         LBL_Credit.FontSize(20);
         LBL_Credit.Width(LENGTH_FILL_PARENT);
-        LBL_Credit.TextColor(Component.COLOR_WHITE);
-        LBL_Credit.Text("Credit  ");
+        LBL_Credit.TextColor(Component.COLOR_BLACK);
+        LBL_Credit.Text("Credit ");
+        LBL_Credit.BackgroundColor(Component.COLOR_NONE);
 
         LBL_CreditTXT = new Label(Harr_Credit);
         LBL_CreditTXT.FontSize(20);
         LBL_CreditTXT.TextColor(Component.COLOR_BLACK);
         LBL_CreditTXT.Width(LENGTH_FILL_PARENT);
+        LBL_CreditTXT.BackgroundColor(Component.COLOR_NONE);
 
         Harr_BuyBtn = new HorizontalArrangement(HArr_Credit_BuyBtn);
         Harr_BuyBtn.Width(LENGTH_FILL_PARENT);
         Harr_BuyBtn.HeightPercent(7);
-        Harr_BuyBtn.BackgroundColor(Component.COLOR_GRAY);
+        Harr_BuyBtn.BackgroundColor(Component.COLOR_NONE);
 
         BTN_BuyItem = new Button(Harr_BuyBtn);
         BTN_BuyItem.Text("Buy");
@@ -126,12 +136,16 @@ public class Order extends Form implements HandlesEventDispatching {
         LBL_Ordered.FontSize(12);
         LBL_Ordered.Text("Things I've Ordered:");
         LBL_Ordered.TextColor(Component.COLOR_WHITE);
+        LBL_Ordered.FontItalic(true);
+        LBL_Ordered.BackgroundColor(Color.parseColor("#005200"));
 
         ThingsOrdered_ListView = new ListView(VArr);
         ThingsOrdered_ListView.Width(LENGTH_FILL_PARENT);
         ThingsOrdered_ListView.HeightPercent(30);
-        ThingsOrdered_ListView.TextColor(Component.COLOR_WHITE);
-        ThingsOrdered_ListView.TextSize(20);
+        ThingsOrdered_ListView.TextColor(Component.COLOR_BLACK);
+        ThingsOrdered_ListView.TextSize(50);
+        ThingsOrdered_ListView.SelectionColor(Color.parseColor("#009F00"));
+        ThingsOrdered_ListView.BackgroundColor(Component.COLOR_NONE);
 
         messages = new Notifier(this);
         messages.BackgroundColor(Component.COLOR_RED);

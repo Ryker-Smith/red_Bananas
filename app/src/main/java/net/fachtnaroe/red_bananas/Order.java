@@ -1,149 +1,137 @@
 package net.fachtnaroe.red_bananas;
 
-import android.provider.ContactsContract;
-
-import androidx.core.view.KeyEventDispatcher;
+import android.graphics.Color;
+import android.util.Log;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.EventDispatcher;
 import com.google.appinventor.components.runtime.Form;
 import com.google.appinventor.components.runtime.HandlesEventDispatching;
-import com.google.appinventor.components.runtime.Label;
-import com.google.appinventor.components.runtime.VerticalScrollArrangement;
 import com.google.appinventor.components.runtime.HorizontalArrangement;
+import com.google.appinventor.components.runtime.Label;
 import com.google.appinventor.components.runtime.ListView;
-import com.google.appinventor.components.runtime.Web;
-import com.google.appinventor.components.runtime.File;
 import com.google.appinventor.components.runtime.Notifier;
+import com.google.appinventor.components.runtime.VerticalArrangement;
+import com.google.appinventor.components.runtime.Web;
+import com.google.appinventor.components.runtime.util.YailList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Order extends Form implements HandlesEventDispatching {
-    private Button BTN_Test, BTN_BuyItem;
-    private VerticalScrollArrangement VArr;
+    private Button BTN_BuyItem;
+    private VerticalArrangement VArr;
     private Label LBL_Title, LBL_UserN, LBL_UserTXT, LBL_pID, LBL_pIDTXT, LBL_AvToOrdr, LBL_Credit, LBL_CreditTXT, LBL_Ordered;
-    private HorizontalArrangement HArr1, HArr2, HArr3, HArr4, HArr5, HArr6, HArr7;
-    private ListView LST_ThingsA, LST_ThingsO, LST_Temp;
+    private HorizontalArrangement HArr_UserInfo, HArr_Credit_BuyBtn, Harr_Credit, Harr_BuyBtn;
+    private ListView ThingsAvailableToBuy_ListView, ThingsOrdered_ListView;
     private String baseURL = "https://fachtnaroe.net/bananas?",
             SessionID = MainActivity.getSessionID(),
             pID = MainActivity.getPID(),
-            username=MainActivity.getUsername(),
-            getCreditURL=baseURL+"sessionID="+ SessionID + "&entity=person&method=GET&pID="+ pID;
-    private Web Web_TfS, Web_TB,Web_Credit,Web_Credit2,Web_PlaceOrder;
-    private File FileDBS;
+            username = MainActivity.getUsername(),
+            getCreditURL = baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID;
+    private Web Web_TfS, Web_TB, Web_Credit, Web_Credit2, Web_PlaceOrder;
     private Notifier messages;
-    private Double newCredit;
-
 
     protected void $define() {
-        VArr = new VerticalScrollArrangement(this);
+        VArr = new VerticalArrangement(this);
+        VArr.Height(LENGTH_FILL_PARENT);
+        VArr.Width(LENGTH_FILL_PARENT);
+        VArr.BackgroundColor(Component.COLOR_BLUE);
 
-        HArr1 = new HorizontalArrangement(VArr);
-        HArr1.WidthPercent(100);
-        HArr1.HeightPercent(10);
-        HArr1.BackgroundColor(Component.COLOR_BLACK);
-
-        HArr2 = new HorizontalArrangement(VArr);
-        HArr2.WidthPercent(100);
-        HArr2.HeightPercent(5);
-        HArr2.BackgroundColor(Component.COLOR_BLACK);
-
-        HArr3 = new HorizontalArrangement(VArr);
-        HArr3.WidthPercent(100);
-        HArr3.HeightPercent(5);
-        HArr3.BackgroundColor(Component.COLOR_PINK);
-
-        HArr4 = new HorizontalArrangement(VArr);
-        HArr4.WidthPercent(100);
-        HArr4.HeightPercent(40);
-        HArr4.BackgroundColor(Component.COLOR_LTGRAY);
-
-        HArr5 = new HorizontalArrangement(VArr);
-        HArr5.WidthPercent(100);
-        HArr5.HeightPercent(7);
-        HArr5.BackgroundColor(Component.COLOR_CYAN);
-
-        HArr6 = new HorizontalArrangement(VArr);
-        HArr6.WidthPercent(100);
-        HArr6.HeightPercent(5);
-        HArr6.BackgroundColor(Component.COLOR_MAGENTA);
-
-        HArr7 = new HorizontalArrangement(VArr);
-        HArr7.WidthPercent(100);
-        HArr7.HeightPercent(25);
-        HArr7.BackgroundColor(Component.COLOR_YELLOW);
-
-        LBL_Title = new Label(HArr1);
-        LBL_Title.WidthPercent(100);
-        LBL_Title.FontSize(30);
+        LBL_Title = new Label(VArr);
+        LBL_Title.Width(LENGTH_FILL_PARENT);
+        LBL_Title.FontSize(20);
+        LBL_Title.FontBold(true);
         LBL_Title.Text("Food Delivery Service");
-        LBL_Title.TextColor(Component.COLOR_ORANGE);
+        LBL_Title.TextColor(Component.COLOR_WHITE);
+        LBL_Title.TextAlignment(Component.ALIGNMENT_CENTER);
 
-        LBL_UserN = new Label(HArr2);
-        LBL_UserN.WidthPercent(25);
+        HArr_UserInfo = new HorizontalArrangement(VArr);
+        HArr_UserInfo.Width(LENGTH_FILL_PARENT);
+        HArr_UserInfo.HeightPercent(5);
+        HArr_UserInfo.BackgroundColor(Component.COLOR_GRAY);
+
+        LBL_UserN = new Label(HArr_UserInfo);
         LBL_UserN.FontSize(15);
         LBL_UserN.Text("Username:");
-        LBL_UserN.TextColor(COLOR_BLUE);
+        LBL_UserN.TextColor(Component.COLOR_WHITE);
 
-        LBL_UserTXT = new Label(HArr2);
-        LBL_UserTXT.WidthPercent(50);
+        LBL_UserTXT = new Label(HArr_UserInfo);
+        LBL_UserTXT.Width(LENGTH_FILL_PARENT);
         LBL_UserTXT.FontSize(15);
         LBL_UserTXT.Text(username);
         LBL_UserTXT.TextColor(COLOR_RED);
 
-        LBL_pID = new Label(HArr2);
-        LBL_pID.WidthPercent(12);
+        LBL_pID = new Label(HArr_UserInfo);
         LBL_pID.FontSize(15);
         LBL_pID.Text("pID:");
-        LBL_pID.TextColor(COLOR_BLUE);
+        LBL_pID.TextColor(Component.COLOR_WHITE);
 
-        LBL_pIDTXT = new Label(HArr2);
-        LBL_pIDTXT.WidthPercent(13);
+        LBL_pIDTXT = new Label(HArr_UserInfo);
         LBL_pIDTXT.FontSize(15);
         LBL_pIDTXT.Text(pID);
         LBL_pIDTXT.TextColor(COLOR_RED);
 
-        LBL_AvToOrdr = new Label(HArr3);
-        LBL_AvToOrdr.WidthPercent(100);
-
-        LBL_AvToOrdr.FontSize(12);
+        LBL_AvToOrdr = new Label(VArr);
+        LBL_AvToOrdr.Width(LENGTH_FILL_PARENT);
+        LBL_AvToOrdr.FontSize(14);
         LBL_AvToOrdr.Text("Things Available For Purchase:");
-        LBL_AvToOrdr.TextColor(Component.COLOR_ORANGE);
+        LBL_AvToOrdr.TextColor(Component.COLOR_WHITE);
 
-        LST_ThingsA = new ListView(HArr4);
-        LST_ThingsA.WidthPercent(100);
+        ThingsAvailableToBuy_ListView = new ListView(VArr);
+        ThingsAvailableToBuy_ListView.Width(LENGTH_FILL_PARENT);
+        ThingsAvailableToBuy_ListView.Height(LENGTH_FILL_PARENT);
+        ThingsAvailableToBuy_ListView.TextSize(20);
+        ThingsAvailableToBuy_ListView.TextColor(Component.COLOR_WHITE);
 
-        LST_ThingsA.TextColor(Component.COLOR_ORANGE);
+        HArr_Credit_BuyBtn = new HorizontalArrangement(VArr);
+        HArr_Credit_BuyBtn.Width(LENGTH_FILL_PARENT);
+        HArr_Credit_BuyBtn.HeightPercent(7);
+        HArr_Credit_BuyBtn.BackgroundColor(Component.COLOR_GRAY);
 
-        LBL_Credit = new Label(HArr5);
-        LBL_Credit.FontSize(16);
-        LBL_Credit.WidthPercent(15);
-        LBL_Credit.TextColor(Component.COLOR_MAGENTA);
+        Harr_Credit = new HorizontalArrangement(HArr_Credit_BuyBtn);
+        Harr_Credit.Width(LENGTH_FILL_PARENT);
+        Harr_Credit.HeightPercent(7);
+        Harr_Credit.BackgroundColor(Component.COLOR_GRAY);
+
+        LBL_Credit = new Label(Harr_Credit);
+        LBL_Credit.FontSize(20);
+        LBL_Credit.Width(LENGTH_FILL_PARENT);
+        LBL_Credit.TextColor(Component.COLOR_WHITE);
         LBL_Credit.Text("Credit  ");
 
-        LBL_CreditTXT = new Label(HArr5);
-        LBL_CreditTXT.FontSize(16);
+        LBL_CreditTXT = new Label(Harr_Credit);
+        LBL_CreditTXT.FontSize(20);
         LBL_CreditTXT.TextColor(Component.COLOR_BLACK);
-        LBL_CreditTXT.WidthPercent(35);
+        LBL_CreditTXT.Width(LENGTH_FILL_PARENT);
 
-        BTN_BuyItem = new Button(HArr5);
+        Harr_BuyBtn = new HorizontalArrangement(HArr_Credit_BuyBtn);
+        Harr_BuyBtn.Width(LENGTH_FILL_PARENT);
+        Harr_BuyBtn.HeightPercent(7);
+        Harr_BuyBtn.BackgroundColor(Component.COLOR_GRAY);
+
+        BTN_BuyItem = new Button(Harr_BuyBtn);
         BTN_BuyItem.Text("Buy");
-        BTN_BuyItem.WidthPercent(50);
+        BTN_BuyItem.Width(LENGTH_FILL_PARENT);
         BTN_BuyItem.TextColor(COLOR_BLACK);
 
-        LBL_Ordered = new Label(HArr6);
-        LBL_Ordered.WidthPercent(100);
-
+        LBL_Ordered = new Label(VArr);
+        LBL_Ordered.Width(LENGTH_FILL_PARENT);
         LBL_Ordered.FontSize(12);
         LBL_Ordered.Text("Things I've Ordered:");
-        LBL_Ordered.TextColor(Component.COLOR_ORANGE);
+        LBL_Ordered.TextColor(Component.COLOR_WHITE);
 
-        LST_ThingsO = new ListView(HArr7);
-        LST_ThingsO.WidthPercent(100);
-        LST_ThingsO.TextColor(Component.COLOR_WHITE);
+        ThingsOrdered_ListView = new ListView(VArr);
+        ThingsOrdered_ListView.Width(LENGTH_FILL_PARENT);
+        ThingsOrdered_ListView.HeightPercent(30);
+        ThingsOrdered_ListView.TextColor(Component.COLOR_WHITE);
+        ThingsOrdered_ListView.TextSize(20);
 
         messages = new Notifier(this);
         messages.BackgroundColor(Component.COLOR_RED);
@@ -157,204 +145,144 @@ public class Order extends Form implements HandlesEventDispatching {
         Web_TB.Url(baseURL + "sessionID=" + SessionID + "&entity=prettyorders&method=GET");
         Web_TB.Get();
 
-        Web_Credit= new Web(this);
-        Web_Credit.Url(baseURL+"sessionID="+ SessionID + "&entity=person&method=GET&pID="+ pID);
+        Web_Credit = new Web(this);
+        Web_Credit.Url(getCreditURL);
         Web_Credit.Get();
 
-        Web_Credit2= new Web(this);
+        Web_Credit2 = new Web(this);
 
-        Web_PlaceOrder= new Web(this);
+        Web_PlaceOrder = new Web(this);
 
         EventDispatcher.registerEventForDelegation(this, formName, "Click");
         EventDispatcher.registerEventForDelegation(this, formName, "Initialize");
-        EventDispatcher.registerEventForDelegation(this, "GotTextEvent", "GotText" );
+        EventDispatcher.registerEventForDelegation(this, "GotTextEvent", "GotText");
     }
 
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
         if (eventName.equals("Click")) {
             if (component.equals(BTN_BuyItem)) {
-                buyThis(LST_ThingsA.Selection());
+                buyThis(ThingsAvailableToBuy_ListView.Selection());
                 return true;
             } else {
                 return false;
             }
         }
         if (component.equals(Web_TfS) && eventName.equals("GotText")) {
-            JsonSortThingsListView((String) params[3]);
+            //calling the procedure For the ListView containing the Items that are available to buy
+            jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"thing", "null");
             return true;
         }
-        if (component.equals(Web_TB) && eventName.equals("GotText")
-        ) {
-            sortJsonShite((String)params[3]);
+        if (component.equals(Web_TB) && eventName.equals("GotText")) {
+            //calling the procedure For the ListView containing the Items that the buyer has ordered
+            jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"prettyorders", "buyerID");
             return true;
         }
         if (component.equals(Web_Credit) && eventName.equals("GotText")) {
-            JsonCreditThings((String) params[3]);
+            Log.w("TIN**",(String) params[3]);
+            JsonCreditThings(params[1].toString(), (String) params[3]);
             return true;
         }
         if (component.equals(Web_PlaceOrder) && eventName.equals("GotText")) {
-            String response=((String) params[3]);
-            if(response.contains("OK")){
-                String oid =response.substring(22,response.length()-2);
-                messages.ShowAlert("Your Order Has Been Placed : "+oid);
+            String response = ((String) params[3]);
+            if (response.contains("OK")) {
+                String oid = response.substring(22, response.length() - 2);
+                messages.ShowAlert("Your Order Has Been Placed : " + oid);
 
             }
             return true;
         }
         return false;
     }
+
     public void buyThis(String x) {
-        if((LST_ThingsA.Selection().isEmpty())) {
+        if ((ThingsAvailableToBuy_ListView.Selection().isEmpty())) {
             messages.ShowAlert("No Item Selected");
-        }
-        else {
+        } else {
             int i = x.indexOf("]");
-            int euro = x.indexOf("€")+1;
-            String price =x.substring(euro,x.length());
-
-
-            String oldCredit = LBL_CreditTXT.Text().replace("€","");
-//            newCredit=Double.parseDouble(oldCredit)-Double.parseDouble(price);
-//            String s=Double
-//            LBL_Ordered.Text(Double.toString(newCredit));
-//            LBL_CreditTXT.Text("€"+newCredit);
-//            LBL_Ordered.Text(oldCredit+" "+price);
-            String y = x.substring(1,i);
-            String[] url_IDs =y.split(":");
-            Web_PlaceOrder.Url(baseURL+"sessionID="+SessionID+"&entity=orders&method=POST&tID="+url_IDs[0]+"&sellerID="+url_IDs[1]+"&slotNum=1&buyerID="+pID);
+            int euro = x.indexOf("€") + 1;
+            String price = x.substring(euro);
+            String oldCredit = LBL_CreditTXT.Text().replace("€", "");
+            String y = x.substring(1, i);
+            String[] url_IDs = y.split(":");
+            Web_PlaceOrder.Url(baseURL + "sessionID=" + SessionID + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + pID);
             Web_PlaceOrder.Get();
-//            creditUpdateAfterBuy(Integer.parseInt(oldCredit), Integer.parseInt(price));
             creditUpdateAfterBuy(Double.parseDouble(oldCredit), Double.parseDouble(price));
         }
     }
-    public void creditUpdateAfterBuy(Double x, Double y){
-       Double i = x-y;
-       String p = Double.toString(i);
-        LBL_CreditTXT.Text("€"+p);
-        Web_Credit2.Url(baseURL+"sessionID="+ SessionID + "&entity=person&method=PUT&pID="+ pID+"&Credit="+p);
+    public void creditUpdateAfterBuy(Double x, Double y) {
+        Double i = x - y;
+        String p = Double.toString(i);
+        LBL_CreditTXT.Text("€" + p);
+        Web_Credit2.Url(getCreditURL+ "&Credit=" + p);
         Web_Credit2.Get();
     }
-    public void JsonSortThingsListView(String jsonString) {
+    public void JsonCreditThings(String status, String textOfResponse) {
+//        int start = Y.lastIndexOf("Credit") + 9;
+//        int finish = Y.lastIndexOf("Email") - 3;
+//        String Rep1 = Y.substring(start, finish);
 
-// for loop to sort by pID
-        String Temp1 = "";
-        //Used https://stackoverflow.com/questions/48449004/java-storing-the-output-of-a-for-loop-into-an-array/48449039 and https://www.w3schools.com/java/java_ref_string.asp
-        List<String> jsonIsMySon = new ArrayList<String>();
-        char start = '{';
-        char finish = '}';
-        int e = 0;
-        for (int i = 0; i < jsonString.length(); i++) {
-            char thisChar = jsonString.charAt(i);
-            if (thisChar == start) {
+        Log.w("personTING**","1");
+        if (status.equals("200")) try {
+            Log.w("personTING**","2");
+            JSONObject parser = new JSONObject(textOfResponse);
+            String bean = parser.getString("person");
+            Log.w("personTING**",parser.getString("person"));
+            //JSONObject credit =
 
-                e = i+1;
-            }
-            else if ((thisChar == finish)) {
-                String Temp2 = jsonString.substring(e, i);;
-                if (!(Temp2.contains("]"))){
-                    if (Temp2.contains("tSoldBy\":\"")) {
-                        jsonIsMySon.add(Temp2);
+            //LBL_CreditTXT.Text("€" + parser.getString("Credit"));
+    } catch (JSONException e) {
+        // if an exception occurs, code for it in here
+        messages.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
+    }
+        else {
+        messages.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
+    }
+
+    }
+    //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
+    public void jsonSortAndListViewForBuyerScreen(String status, String textOfResponse, String tableName, String fieldName) {
+        List<String> ListViewItemArray;
+        if (status.equals("200")) try {
+            ListViewItemArray = new ArrayList<String>();
+            // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
+            JSONObject parser = new JSONObject(textOfResponse);
+            if (!parser.getString(tableName).equals("")) {
+                JSONArray jsonIsMySon = parser.getJSONArray(tableName);
+                for (int i = 0; i < jsonIsMySon.length(); i++) {
+                    String oneEntryInTheListView = "";
+                    //add data from table to the sting above by getting the field name you want from the brief ( example where field name is "sellerID": oneEntryInTheListView = jsonIsMySon.getJSONObject(i).getString("sellerID"); )
+                    //formats entries the ListView containing the items in thing table
+                    if (tableName.equals("thing") && fieldName.equals("null")){
+                        oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("tID")
+                                + " : " + jsonIsMySon.getJSONObject(i).getString("tSoldBy")
+                                + "] " + jsonIsMySon.getJSONObject(i).getString("tName")
+                                + " (" + jsonIsMySon.getJSONObject(i).getString("tDescription")
+                                + ") €" + jsonIsMySon.getJSONObject(i).getString("tPrice");
+                        ListViewItemArray.add(oneEntryInTheListView);
+                    }
+                    //formats entries the ListView containing the orders buyer has placed
+                    else if ((tableName.equals("prettyorders") && fieldName.equals("buyerID")) && (Integer.valueOf(jsonIsMySon.getJSONObject(i).getString(fieldName)).equals( Integer.valueOf(pID)))) {
+                        oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("oID")
+                                + "] " + jsonIsMySon.getJSONObject(i).getString("tName")
+                                + " from " + jsonIsMySon.getJSONObject(i).getString("seller")
+                                + " [ tID: " + jsonIsMySon.getJSONObject(i).getString("tID") + " ]";
+                        ListViewItemArray.add(oneEntryInTheListView);
                     }
                 }
-            }
-
-        }
-
-//        LBL_AvToOrdr.Text(jsonIsMySon.get(1));
-
-//        String loge = "";
-        //For Loop to Rearrange Data To How I want
-        String Temp3="";
-        for (int a=0;a<jsonIsMySon.size();a++){
-            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
-            String r2 = r1.replace(",", "-");
-            String[] keyValueArray = r2.split("<SPLIT>");
-            //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy
-            jsonIsMySon.set(a,"["+keyValueArray[1]+":"+keyValueArray[5]+"]"+keyValueArray[2]+"("+keyValueArray[0]+")€"+keyValueArray[4]);
-
-
-            if(a==0){
-                //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy  logetiddy
-//                String[] keyValueArray = r1.split(",");
-//                jsonIsMySon.set(a,"["+keyValueArray[2]+":"+keyValueArray[6]+"]"+keyValueArray[3]+"("+keyValueArray[1]+")€"+keyValueArray[5]);
-                Temp3+=jsonIsMySon.get(a);
-            }
-            else{
-                //Rearrange Json data [0]=tDescription,[1]=tID,[2]=tName,[3]=tPicture,[4]=tPrice,[5]=tSoldBy  logetiddy
-//                String[] keyValueArray = r1.split(",");
-//                jsonIsMySon.set(a,"["+keyValueArray[1]+":"+keyValueArray[5]+"]"+keyValueArray[2]+"("+keyValueArray[0]+")€"+keyValueArray[4]);
-                Temp3+=","+jsonIsMySon.get(a);
-            }
-        }
-
-        //Format for use in listView-Remove KeyNames
-        String r2 = Temp3.replace("\":\"","");
-        String r3 = r2.replace("\"tDescription","");
-        String r4 = r3.replace("tID","");
-        String r5 = r4.replace("tName","");
-        String r6 = r5.replace("tPrice","");
-        String r7 = r6.replace("tSoldBy","");
-        String r8 = r7.replace("\"","");
-
-        LST_ThingsA.ElementsFromString(r8);
-       // String y=jsonIsMySon.get(0);
-
-
-    }
-    public void JsonCreditThings(String Y) {
-        int start = Y.lastIndexOf("Credit")+9;
-        int finish = Y.lastIndexOf("Email")-3;
-        String Rep1 = Y.substring(start,finish);
-        LBL_CreditTXT.Text("€"+Rep1);
-    }
-
-    public void sortJsonShite(String jsonString){
-        List<String> jsonIsMySon = new ArrayList<String>();
-        String Temp1 = "";
-        char start = '{';
-        char finish = '}';
-        int e = 0;
-        for     (int i = 0; i < jsonString.length(); i++) {
-            char thisChar = jsonString.charAt(i);
-            if (thisChar == start) {
-                e = i+1;
-            }
-            else if ((thisChar == finish)) {
-                String Temp2 = jsonString.substring(e, i);
-                if (!(Temp2.contains("]"))){
-                    if (Temp2.contains("buyerID\":\"" + pID)) {
-                        jsonIsMySon.add(Temp2);
-                    }
+                YailList tempData = YailList.makeList(ListViewItemArray);
+                if (tableName.equals("prettyorders") && fieldName.equals("buyerID")) {
+                    ThingsOrdered_ListView.Elements(tempData);
+                }
+                if (tableName.equals("thing") && fieldName.equals("null")) {
+                    ThingsAvailableToBuy_ListView.Elements(tempData);
                 }
             }
-
+        } catch (JSONException e) {
+            // if an exception occurs, code for it in here
+            messages.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
         }
-//        for (int a=0;a<jsonIsMySon.size();a++){
-//            Temp1+=jsonIsMySon.get(a)+"*-*";
-//        }
-//        String Loge="";
-
-        String Temp3="";
-        for (int a=0;a<jsonIsMySon.size();a++){
-            String r1 = jsonIsMySon.get(a).replace("\",\"", "<SPLIT>");
-            String r2 = r1.replace(",", "-");
-            String[] keyValueArray = r2.split("<SPLIT>");
-            //Rearrange Json data [0]=buyerID,[1]=oID,[2]=seller name ,[3]=tID,[4]=tName-ItemName
-             jsonIsMySon.set(a,"["+keyValueArray[1]+"] "+keyValueArray[4]+" from "+keyValueArray[2]);
-            if(a==0){
-                Temp3+=jsonIsMySon.get(a);
-            }
-            else{
-                Temp3+=","+jsonIsMySon.get(a);
-            }
+        else {
+            messages.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
         }
-
-        String r1 = Temp3.replace("\"", "");
-        String r2 = r1.replace(":", "");
-        String r3 = r2.replace("oID", "");
-        String r4 = r3.replace("tName", "");
-        String r5 = r4.replace("seller", "");
-        LST_ThingsO.ElementsFromString(r5);
     }
-
 }

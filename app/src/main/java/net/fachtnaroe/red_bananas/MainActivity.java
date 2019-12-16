@@ -16,6 +16,9 @@ import com.google.appinventor.components.runtime.TextBox;
 import com.google.appinventor.components.runtime.VerticalArrangement;
 import com.google.appinventor.components.runtime.Web;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends Form implements HandlesEventDispatching {
 
     private Label title, UserL, PasswL;
@@ -25,11 +28,11 @@ public class MainActivity extends Form implements HandlesEventDispatching {
     private Button login;
     private VerticalArrangement Varr1;
     private HorizontalArrangement Harr_EmptySpaceAfterTitle, Harr_UserInfo, Harr_Password, Harr_Checkboxes, H1_EmptySpaceBefore, H2_EmptySpaceAfter, Harr_EmptySpaceBeforeLoginBtn;
-    private String Spass = "", weblogin = "https://fachtnaroe.net/bananas?cmd=LOGIN&user=", webLogin2 = "&pass=", ResonseContent;
+    private String passwordForURL = "", weblogin = "https://fachtnaroe.net/bananas?cmd=LOGIN&user=", webLogin2 = "&pass=", ResonseContent;
     private Web webLoginConnection;
     private Notifier GotTextNotifier;
     boolean buyerBool = false, salesBool = false;
-    private static String Suser = "", SessionId = "", pID = "";
+    private static String usernameForURL = "", SessionId = "", pID = "";
 
     protected void $define() {
         webLoginConnection = new Web(this);
@@ -135,8 +138,7 @@ public class MainActivity extends Form implements HandlesEventDispatching {
             return true;
         }
         if (eventName.equals("GotText")) {
-            sortJsonDeet(params);
-            loginResult(params);
+            jsonLoginCheckAndValuePasser(params[1].toString(),params[3].toString());
             return true;
         }
         return false;
@@ -146,45 +148,40 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         if ((salesBool && buyerBool) || (!(salesBool || buyerBool))) {
             GotTextNotifier.ShowAlert("Check ONE box");
         } else {
-            Suser = username.Text();
-            Spass = password.Text();
-            webLoginConnection.Url(weblogin + Suser + webLogin2 + Spass);
+            usernameForURL = username.Text();
+            passwordForURL = password.Text();
+            webLoginConnection.Url(weblogin + usernameForURL + webLogin2 + passwordForURL);
             webLoginConnection.Get();
         }
     }
-
-    public void loginResult(Object[] params) {
-        ResonseContent = (String) params[3];
-        if (ResonseContent.contains("OK")) {
-            GotTextNotifier.ShowAlert("OK");
-            this.BackgroundColor(COLOR_GREEN);
-            NextPlaceGo();
-        } else {
-            GotTextNotifier.ShowAlert("Nuh uh");
-            this.BackgroundColor(COLOR_RED);
+    //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
+    public void jsonLoginCheckAndValuePasser(String status, String textOfResponse) {
+        if (status.equals("200")) try {
+            // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
+            JSONObject parser = new JSONObject(textOfResponse);
+            String status_json = parser.getString("Status");
+            if(status_json.contains("OK")){
+                pID = parser.getString("pID");
+                SessionId = parser.getString("sessionID");
+                if (salesBool && !buyerBool) {
+                    Intent i = new Intent(getApplicationContext(), Sales.class);
+                    startActivity(i);
+                } else if (!salesBool && buyerBool) {
+                    Intent i = new Intent(getApplicationContext(), Order.class);
+                    startActivity(i);
+                }
+            }
+        } catch (JSONException e) {
+            // if an exception occurs, code for it in here
+            GotTextNotifier.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
         }
-    }
-
-    public void NextPlaceGo() {
-        if (salesBool && !buyerBool) {
-            Intent i = new Intent(getApplicationContext(), Sales.class);
-            startActivity(i);
-        } else if (!salesBool && buyerBool) {
-            Intent i = new Intent(getApplicationContext(), Order.class);
-            startActivity(i);
+        else {
+            GotTextNotifier.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
         }
-    }
-
-    public void sortJsonDeet(Object[] params) {
-        String jsonString = (String) params[3];
-        int sessionIDFirstChar = (jsonString.indexOf("sessionID")) + 12;
-        int pID_FirstChar = (jsonString.indexOf("pID")) + 8;
-        SessionId = jsonString.substring(sessionIDFirstChar, sessionIDFirstChar + 8);
-        pID = jsonString.substring(pID_FirstChar, pID_FirstChar + 2);
     }
 
     public static String getUsername() {
-        return Suser;
+        return usernameForURL;
     }
 
     public static String getSessionID() {

@@ -13,7 +13,7 @@ import com.google.appinventor.components.runtime.Label;
 import com.google.appinventor.components.runtime.Notifier;
 import com.google.appinventor.components.runtime.PasswordTextBox;
 import com.google.appinventor.components.runtime.TextBox;
-import com.google.appinventor.components.runtime.VerticalScrollArrangement;
+import com.google.appinventor.components.runtime.VerticalArrangement;
 import com.google.appinventor.components.runtime.Web;
 
 public class MainActivity extends Form implements HandlesEventDispatching {
@@ -23,8 +23,8 @@ public class MainActivity extends Form implements HandlesEventDispatching {
     private PasswordTextBox password;
     private CheckBox buyer, seller;
     private Button login;
-    private VerticalScrollArrangement Varr1;
-    private HorizontalArrangement Harr1, Harr2, Harr3, Harr4, Harr5;
+    private VerticalArrangement Varr1;
+    private HorizontalArrangement Harr_EmptySpaceAfterTitle, Harr_UserInfo, Harr_Password, Harr_Checkboxes, H1_EmptySpaceBefore, H2_EmptySpaceAfter, Harr_EmptySpaceBeforeLoginBtn;
     private String Spass = "", weblogin = "https://fachtnaroe.net/bananas?cmd=LOGIN&user=", webLogin2 = "&pass=", ResonseContent;
     private Web webLoginConnection;
     private Notifier GotTextNotifier;
@@ -33,82 +33,84 @@ public class MainActivity extends Form implements HandlesEventDispatching {
 
     protected void $define() {
         webLoginConnection = new Web(this);
-        this.BackgroundColor(COLOR_PINK);
 
         GotTextNotifier = new Notifier(this);
         GotTextNotifier.BackgroundColor(Component.COLOR_BLACK);
         GotTextNotifier.TextColor(Component.COLOR_PINK);
 
-        Varr1 = new VerticalScrollArrangement(this);
-        Varr1.WidthPercent(100);
-        Varr1.HeightPercent(100);
+        Varr1 = new VerticalArrangement(this);
+        Varr1.Height(LENGTH_FILL_PARENT);
+        Varr1.Width(LENGTH_FILL_PARENT);
+        Varr1.BackgroundColor(COLOR_PINK);
 
         title = new Label(Varr1);
-        title.WidthPercent(100);
+        title.Width(LENGTH_FILL_PARENT);
         title.HeightPercent(20);
         title.Text("Food Delivery Service");
         title.TextColor(COLOR_BLACK);
         title.FontBold(true);
-        title.FontSize(50);
+        title.FontSize(30);
         title.TextAlignment(Component.ALIGNMENT_CENTER);
 
-        Harr1 = new HorizontalArrangement(Varr1);
-        Harr1.WidthPercent(100);
-        Harr1.HeightPercent(15);
+        Harr_EmptySpaceAfterTitle = new HorizontalArrangement(Varr1);
+        Harr_EmptySpaceAfterTitle.Height(LENGTH_FILL_PARENT);
 
-        Harr2 = new HorizontalArrangement(Varr1);
-        Harr2.WidthPercent(100);
-        Harr2.HeightPercent(13);
+        Harr_UserInfo = new HorizontalArrangement(Varr1);
+        Harr_UserInfo.Width(LENGTH_FILL_PARENT);
+        Harr_UserInfo.HeightPercent(13);
 
-        Harr3 = new HorizontalArrangement(Varr1);
-        Harr3.WidthPercent(100);
-        Harr3.HeightPercent(15);
-
-
-        Harr4 = new HorizontalArrangement(Varr1);
-        Harr4.WidthPercent(100);
-        Harr4.HeightPercent(20);
-        Harr4.AlignVertical(Component.ALIGNMENT_CENTER);
-
-        Harr5 = new HorizontalArrangement(Varr1);
-        Harr5.WidthPercent(100);
-        Harr5.HeightPercent(20);
-        Harr5.AlignVertical(Component.ALIGNMENT_CENTER);
-
-        UserL = new Label(Harr2);
+        UserL = new Label(Harr_UserInfo);
         UserL.Text("Username");
-        UserL.WidthPercent(LENGTH_FILL_PARENT);
+        UserL.WidthPercent(30);
 
-        username = new TextBox(Harr2);
-        username.WidthPercent(70);
+        username = new TextBox(Harr_UserInfo);
+        username.Width(LENGTH_FILL_PARENT);
+        username.Text("redshop");
 
-        PasswL = new Label(Harr3);
-        PasswL.WidthPercent(LENGTH_FILL_PARENT);
+        Harr_Password = new HorizontalArrangement(Varr1);
+        Harr_Password.Width(LENGTH_FILL_PARENT);
+        Harr_Password.HeightPercent(15);
+
+        PasswL = new Label(Harr_Password);
+        PasswL.WidthPercent(30);
         PasswL.Text("Password");
         PasswL.TextColor(COLOR_BLACK);
 
-        password = new PasswordTextBox(Harr3);
-        password.WidthPercent(70);
+        password = new PasswordTextBox(Harr_Password);
+        password.Width(LENGTH_FILL_PARENT);
+        password.Text("tcfetcfe");
 
-        buyer = new CheckBox(Harr4);
+        Harr_Checkboxes = new HorizontalArrangement(Varr1);
+        Harr_Checkboxes.Width(LENGTH_FILL_PARENT);
+        Harr_Checkboxes.HeightPercent(20);
+
+         H1_EmptySpaceBefore = new HorizontalArrangement(Harr_Checkboxes);
+        H1_EmptySpaceBefore.WidthPercent(20);
+
+        buyer = new CheckBox(Harr_Checkboxes);
         buyer.Text("Buyer");
         buyer.TextColor(COLOR_BLACK);
         buyer.FontSize(25);
-        buyer.WidthPercent(50);
+        buyer.Width(LENGTH_FILL_PARENT);
 
-        seller = new CheckBox(Harr4);
+        seller = new CheckBox(Harr_Checkboxes);
         seller.Text("Seller");
         seller.TextColor(COLOR_BLACK);
         seller.FontSize(25);
-        seller.WidthPercent(50);
 
-        login = new Button(Harr5);
-        login.WidthPercent(100);
+        H2_EmptySpaceAfter = new HorizontalArrangement(Harr_Checkboxes);
+        H2_EmptySpaceAfter.WidthPercent(20);
+
+        Harr_EmptySpaceBeforeLoginBtn = new HorizontalArrangement(Varr1);
+        Harr_EmptySpaceBeforeLoginBtn.Height(LENGTH_FILL_PARENT);
+
+        login = new Button(Varr1);
+        login.Width(LENGTH_FILL_PARENT);
         login.HeightPercent(20);
         login.Text("Login");
         login.FontSize(25);
         login.TextAlignment(Component.ALIGNMENT_CENTER);
-        login.TextColor(COLOR_PINK);
+        login.TextColor(Component.COLOR_PINK);
         login.BackgroundColor(COLOR_BLACK);
 
         EventDispatcher.registerEventForDelegation(this, formName, "Click");

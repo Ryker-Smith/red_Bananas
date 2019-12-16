@@ -1,6 +1,7 @@
 package net.fachtnaroe.red_bananas;
 
 import android.content.Intent;
+import android.graphics.Color;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
@@ -50,41 +51,38 @@ public class Sales extends Form implements HandlesEventDispatching {
         VArr = new VerticalArrangement(this);
         VArr.Height(LENGTH_FILL_PARENT);
         VArr.Width(LENGTH_FILL_PARENT);
+        VArr.BackgroundColor(Component.COLOR_ORANGE);
 
         titleFDS = new Label(VArr);
         titleFDS.Text("Food Delivery Service");
-        titleFDS.FontSize(15);
-        titleFDS.WidthPercent(100);
+        titleFDS.FontSize(20);
+        titleFDS.FontBold(true);
+        titleFDS.Width(LENGTH_FILL_PARENT);
         titleFDS.TextAlignment(Component.ALIGNMENT_CENTER);
-        titleFDS.BackgroundColor(COLOR_GREEN);
         titleFDS.TextColor(COLOR_WHITE);
 
         HArr_User_pID = new HorizontalArrangement(VArr);
-        HArr_User_pID.WidthPercent(100);
-        // HArr_User_pID.HeightPercent(10);
+        HArr_User_pID.Width(LENGTH_FILL_PARENT);
         HArr_User_pID.BackgroundColor(Component.COLOR_LTGRAY);
 
         Label_Username = new Label(HArr_User_pID);
-        Label_Username.WidthPercent(30);
         Label_Username.TextAlignment(Component.ALIGNMENT_NORMAL);
         Label_Username.FontSize(14);
-        Label_Username.Text("Username");
+        Label_Username.Text("Username ");
 
         Username_L = new Label(HArr_User_pID);
-        Username_L.WidthPercent(50);
+        Username_L.Width(LENGTH_FILL_PARENT);
         Username_L.TextAlignment(Component.ALIGNMENT_NORMAL);
         Username_L.FontSize(14);
         Username_L.TextColor(COLOR_BLUE);
         Username_L.Text(TheUsername);
 
         Label_pID = new Label(HArr_User_pID);
-        Label_pID.WidthPercent(10);
         Label_pID.TextAlignment(Component.ALIGNMENT_OPPOSITE);
         Label_pID.FontSize(14);
-        Label_pID.Text("pID");
+        Label_pID.Text("pID ");
 
         pId_L = new Label(HArr_User_pID);
-        pId_L.WidthPercent(10);
         pId_L.TextAlignment(Component.ALIGNMENT_NORMAL);
         pId_L.FontSize(14);
         pId_L.TextColor(COLOR_BLUE);
@@ -93,48 +91,46 @@ public class Sales extends Form implements HandlesEventDispatching {
         things4Sale_Label = new Label(VArr);
         things4Sale_Label.FontSize(12);
         things4Sale_Label.TextColor(COLOR_WHITE);
-        things4Sale_Label.BackgroundColor(COLOR_GREEN);
-        things4Sale_Label.WidthPercent(100);
+        things4Sale_Label.Width(LENGTH_FILL_PARENT);
         things4Sale_Label.Text("My things for sale");
 
         //put a listview here(muoy impotante)
         thingsWeSell_ListView = new ListView(VArr);
-        thingsWeSell_ListView.WidthPercent(100);
-        thingsWeSell_ListView.HeightPercent(30);
-        thingsWeSell_ListView.TextSize(35);
-        thingsWeSell_ListView.BackgroundColor(COLOR_DKGRAY);
+        thingsWeSell_ListView.Width(LENGTH_FILL_PARENT);
+        thingsWeSell_ListView.Height(LENGTH_FILL_PARENT);
+        thingsWeSell_ListView.TextSize(20);
+        thingsWeSell_ListView.BackgroundColor(COLOR_BLACK);
 
         HArr2Btn = new HorizontalArrangement(VArr);
-        HArr2Btn.WidthPercent(100);
+        HArr2Btn.Width(LENGTH_FILL_PARENT);
 
         btnDelete = new Button(HArr2Btn);
         btnDelete.Text("Delete");
-        btnDelete.WidthPercent(50);
-        btnDelete.FontSize(12);
+        btnDelete.Width(LENGTH_FILL_PARENT);
+        btnDelete.FontSize(14);
 
         btnAddNew = new Button(HArr2Btn);
         btnAddNew.Text("Add New");
-        btnAddNew.WidthPercent(50);
-        btnAddNew.FontSize(12);
+        btnAddNew.Width(LENGTH_FILL_PARENT);
+        btnAddNew.FontSize(14);
 
         thingsSold_Label = new Label(VArr);
         thingsSold_Label.Text("My things Sold");
-        thingsSold_Label.WidthPercent(100);
-        thingsSold_Label.BackgroundColor(COLOR_GREEN);
+        thingsSold_Label.Width(LENGTH_FILL_PARENT);
         thingsSold_Label.FontSize(12);
         thingsSold_Label.TextColor(COLOR_WHITE);
 
         //Listview Here
         OrdersPlaced_ListView = new ListView(VArr);
-        OrdersPlaced_ListView.WidthPercent(100);
+        OrdersPlaced_ListView.Width(LENGTH_FILL_PARENT);
         OrdersPlaced_ListView.HeightPercent(30);
-        OrdersPlaced_ListView.TextSize(35);
-        OrdersPlaced_ListView.BackgroundColor(COLOR_DKGRAY);
+        OrdersPlaced_ListView.TextSize(20);
+        OrdersPlaced_ListView.BackgroundColor(COLOR_BLACK);
 
         btnOrderIsCompleted = new Button(VArr);
-        btnOrderIsCompleted.WidthPercent(100);
+        btnOrderIsCompleted.Width(LENGTH_FILL_PARENT);
         btnOrderIsCompleted.Text("Order is completed");
-        btnOrderIsCompleted.FontSize(12);
+        btnOrderIsCompleted.FontSize(14);
 
         webGetThings4Sale = new Web(this);
         webGetThings4Sale.Url(getThingsForSaleURL);
@@ -150,7 +146,8 @@ public class Sales extends Form implements HandlesEventDispatching {
 
         butt1 = new Button(VArr);
         butt1.Text("Go Back");
-        butt1.WidthPercent(100);
+        butt1.FontSize(14);
+        butt1.Width(LENGTH_FILL_PARENT);
         butt1.HeightPercent(10);
 
         EventDispatcher.registerEventForDelegation(this, formName, "Click");

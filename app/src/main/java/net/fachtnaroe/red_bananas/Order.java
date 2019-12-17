@@ -44,7 +44,8 @@ public class Order extends Form implements HandlesEventDispatching {
         VArr.Height(LENGTH_FILL_PARENT);
         VArr.Width(LENGTH_FILL_PARENT);
         VArr.BackgroundColor(Component.COLOR_ORANGE);
-        VArr.Image("FDS_PossibleLogo_03.png");
+        VArr.Image("FDS_PossibleLogo_04.png");
+
         LBL_Title = new Label(VArr);
         LBL_Title.Width(LENGTH_FILL_PARENT);
         LBL_Title.FontSize(20);

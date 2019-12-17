@@ -28,10 +28,12 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
             sessionID = MainActivity.getSessionID();
 
     protected void $define() {
+        this.BackgroundColor(Component.COLOR_ORANGE);
         VArr = new VerticalArrangement(this);
         VArr.Height(LENGTH_FILL_PARENT);
         VArr.Width(LENGTH_FILL_PARENT);
-        VArr.BackgroundColor(Component.COLOR_PINK);
+        VArr.BackgroundColor(Component.COLOR_ORANGE);
+        VArr.Image("FDS_PossibleLogo_04.png");
 
         titleLabel = new Label(VArr);
         titleLabel.Width(LENGTH_FILL_PARENT);
@@ -48,6 +50,7 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
 
         nameTxtBox = new TextBox(VArr);
         nameTxtBox.Width(LENGTH_FILL_PARENT);
+        nameTxtBox.BackgroundColor(Component.COLOR_WHITE);
         nameTxtBox.FontSize(14);
 
         descriptionLabel = new Label(VArr);
@@ -57,6 +60,7 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
 
         descriptionTxtBox = new TextBox(VArr);
         descriptionTxtBox.Width(LENGTH_FILL_PARENT);
+        descriptionTxtBox.BackgroundColor(Component.COLOR_WHITE);
         descriptionTxtBox.FontSize(14);
 
         priceLabel = new Label(VArr);
@@ -74,6 +78,7 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
 
         priceTxtBox = new TextBox(HArr_Price);
         priceTxtBox.Width(LENGTH_FILL_PARENT);
+        priceTxtBox.BackgroundColor(Component.COLOR_WHITE);
         priceTxtBox.FontSize(14);
 
         VArr_EmptySpace = new VerticalArrangement(VArr);
@@ -111,8 +116,6 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
             return true;
         }
         if (eventName.equals("GotText")) {
-            titleLabel.Text((String) params[3]);
-            nameLabel.Text("Saved?");
             savedNotifier.ShowAlert("Item has been saved");
             SalesGo();
             return true;

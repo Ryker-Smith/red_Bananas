@@ -166,6 +166,7 @@ public class MainActivity extends Form implements HandlesEventDispatching {
                 if (seller.Checked()) {
                     Intent i = new Intent(getApplicationContext(), Sales.class);
                     startActivity(i);
+//                    switchFormWithStartValue("Sales",pID+"<SPLIT>"+usernameForURL);
                 }
                 else {
                     Intent i = new Intent(getApplicationContext(), Order.class);

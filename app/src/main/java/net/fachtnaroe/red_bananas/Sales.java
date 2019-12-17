@@ -38,12 +38,14 @@ public class Sales extends Form implements HandlesEventDispatching {
             getThingsSoldURL = baseURL + "sessionID=" + SessionID + "&entity=orders&method=GET",
             webThingDeletURL = baseURL + "sessionID=" + SessionID + "&entity=thing&method=DELETE&tID=",
             webOrderIsCompleteURL = baseURL + "sessionID=" + SessionID + "&entity=orders&method=DELETE&oID=";
+    //private String[] startValue;
     private Web webGetThings4Sale, webGetThingsSold, webThingDelete, webOrderIsComplete;
     private Notifier GotTextNotifier;
 
 
     protected void $define() {
-
+        this.BackgroundColor(Component.COLOR_ORANGE);
+        //startValue = this.startupValue.split("<SPLIT>");
         GotTextNotifier = new Notifier(this);
         GotTextNotifier.BackgroundColor(Component.COLOR_RED);
         GotTextNotifier.TextColor(Component.COLOR_WHITE);
@@ -52,18 +54,21 @@ public class Sales extends Form implements HandlesEventDispatching {
         VArr.Height(LENGTH_FILL_PARENT);
         VArr.Width(LENGTH_FILL_PARENT);
         VArr.BackgroundColor(Component.COLOR_ORANGE);
+        VArr.Image("FDS_PossibleLogo_04.png");
 
         titleFDS = new Label(VArr);
         titleFDS.Text("Food Delivery Service");
+       // titleFDS.Text(startValue[0]+" wow "+startValue[1]);
         titleFDS.FontSize(20);
         titleFDS.FontBold(true);
         titleFDS.Width(LENGTH_FILL_PARENT);
         titleFDS.TextAlignment(Component.ALIGNMENT_CENTER);
         titleFDS.TextColor(COLOR_WHITE);
+        titleFDS.BackgroundColor(Color.parseColor("#005200"));
 
         HArr_User_pID = new HorizontalArrangement(VArr);
         HArr_User_pID.Width(LENGTH_FILL_PARENT);
-        HArr_User_pID.BackgroundColor(Component.COLOR_LTGRAY);
+        HArr_User_pID.BackgroundColor(Component.COLOR_NONE);
 
         Label_Username = new Label(HArr_User_pID);
         Label_Username.TextAlignment(Component.ALIGNMENT_NORMAL);
@@ -93,13 +98,16 @@ public class Sales extends Form implements HandlesEventDispatching {
         things4Sale_Label.TextColor(COLOR_WHITE);
         things4Sale_Label.Width(LENGTH_FILL_PARENT);
         things4Sale_Label.Text("My things for sale");
+        things4Sale_Label.BackgroundColor(Color.parseColor("#005200"));
 
         //put a listview here(muoy impotante)
         thingsWeSell_ListView = new ListView(VArr);
         thingsWeSell_ListView.Width(LENGTH_FILL_PARENT);
         thingsWeSell_ListView.Height(LENGTH_FILL_PARENT);
-        thingsWeSell_ListView.TextSize(20);
-        thingsWeSell_ListView.BackgroundColor(COLOR_BLACK);
+        thingsWeSell_ListView.TextSize(50);
+        thingsWeSell_ListView.TextColor(Component.COLOR_BLACK);
+        thingsWeSell_ListView.SelectionColor(Color.parseColor("#009F00"));
+        thingsWeSell_ListView.BackgroundColor(Component.COLOR_NONE);
 
         HArr2Btn = new HorizontalArrangement(VArr);
         HArr2Btn.Width(LENGTH_FILL_PARENT);
@@ -119,13 +127,16 @@ public class Sales extends Form implements HandlesEventDispatching {
         thingsSold_Label.Width(LENGTH_FILL_PARENT);
         thingsSold_Label.FontSize(12);
         thingsSold_Label.TextColor(COLOR_WHITE);
+        thingsSold_Label.BackgroundColor(Color.parseColor("#005200"));
 
         //Listview Here
         OrdersPlaced_ListView = new ListView(VArr);
         OrdersPlaced_ListView.Width(LENGTH_FILL_PARENT);
         OrdersPlaced_ListView.HeightPercent(30);
-        OrdersPlaced_ListView.TextSize(20);
-        OrdersPlaced_ListView.BackgroundColor(COLOR_BLACK);
+        OrdersPlaced_ListView.TextSize(50);
+        OrdersPlaced_ListView.TextColor(Component.COLOR_BLACK);
+        OrdersPlaced_ListView.SelectionColor(Color.parseColor("#009F00"));
+        OrdersPlaced_ListView.BackgroundColor(Component.COLOR_NONE);
 
         btnOrderIsCompleted = new Button(VArr);
         btnOrderIsCompleted.Width(LENGTH_FILL_PARENT);

@@ -91,11 +91,11 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
 
         webSaveNewItem = new Web(this);
 
-        butt1 = new Button(VArr);
-        butt1.Text("Go Back");
-        butt1.Width(LENGTH_FILL_PARENT);
-        butt1.HeightPercent(10);
-        butt1.FontSize(14);
+//        butt1 = new Button(VArr);
+//        butt1.Text("Go Back");
+//        butt1.Width(LENGTH_FILL_PARENT);
+//        butt1.HeightPercent(10);
+//        butt1.FontSize(14);
 
         savedNotifier = new Notifier(this);
 
@@ -105,10 +105,10 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
 
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
         if (eventName.equals("Click")) {
-            if (component.equals((butt1))) {
-                SalesGo();
-                return true;
-            }
+//            if (component.equals((butt1))) {
+//                SalesGo();
+//                return true;
+//            }
             if (component.equals((saveThisBtn))) {
                 saveThis();
                 return true;
@@ -130,7 +130,9 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
     }
 
     public void SalesGo() {
-        Intent i = new Intent(getApplicationContext(), Sales.class);
-        startActivity(i);
+//        Intent i = new Intent(getApplicationContext(), Sales.class);
+//        startActivity(i);
+        switchFormWithStartValue("Sales",this.startupValue);
+
     }
 }

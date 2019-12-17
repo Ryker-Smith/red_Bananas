@@ -164,13 +164,14 @@ public class MainActivity extends Form implements HandlesEventDispatching {
                 pID = parser.getString("pID");
                 SessionId = parser.getString("sessionID");
                 if (seller.Checked()) {
-                    Intent i = new Intent(getApplicationContext(), Sales.class);
-                    startActivity(i);
-//                    switchFormWithStartValue("Sales",pID+"<SPLIT>"+usernameForURL);
+                    //Intent i = new Intent(getApplicationContext(), Sales.class);
+                    //startActivity(i);
+                    switchFormWithStartValue("Sales","<SPLIT>"+pID+"<SPLIT>"+usernameForURL+"<SPLIT>"+SessionId+"<SPLIT>");
                 }
                 else {
-                    Intent i = new Intent(getApplicationContext(), Order.class);
-                    startActivity(i);
+//                    Intent i = new Intent(getApplicationContext(), Order.class);
+//                    startActivity(i);
+                    switchFormWithStartValue("Order","<SPLIT>"+pID+"<SPLIT>"+usernameForURL+"<SPLIT>"+SessionId+"<SPLIT>");
                 }
             }
         } catch (JSONException e) {

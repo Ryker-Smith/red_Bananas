@@ -1,7 +1,6 @@
 package net.fachtnaroe.red_bananas;
 
 import android.graphics.Color;
-import android.util.Log;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
@@ -35,11 +34,14 @@ public class Order extends Form implements HandlesEventDispatching {
             pID = MainActivity.getPID(),
             username = MainActivity.getUsername(),
             getCreditURL = baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID;
+    private String[] startValue;
     private Web Web_TfS, Web_TB, Web_Credit, Web_Credit2, Web_PlaceOrder;
     private Notifier messages;
 
     protected void $define() {
         this.BackgroundColor(Component.COLOR_ORANGE);
+        //[0]=extra quotation mark(not to be used) [1]=pId [2]=Username [3]=SessionID [4]=extra quotation mark(not to be used)
+        startValue = this.startupValue.split("<SPLIT>");
         VArr = new VerticalArrangement(this);
         VArr.Height(LENGTH_FILL_PARENT);
         VArr.Width(LENGTH_FILL_PARENT);
@@ -68,7 +70,8 @@ public class Order extends Form implements HandlesEventDispatching {
         LBL_UserTXT = new Label(HArr_UserInfo);
         LBL_UserTXT.Width(LENGTH_FILL_PARENT);
         LBL_UserTXT.FontSize(15);
-        LBL_UserTXT.Text(username);
+//        LBL_UserTXT.Text(username);
+        LBL_UserTXT.Text(startValue[2]);
         LBL_UserTXT.TextColor(COLOR_RED);
         LBL_UserTXT.FontBold(true);
 
@@ -79,7 +82,8 @@ public class Order extends Form implements HandlesEventDispatching {
 
         LBL_pIDTXT = new Label(HArr_UserInfo);
         LBL_pIDTXT.FontSize(15);
-        LBL_pIDTXT.Text(pID);
+//        LBL_pIDTXT.Text(pID);
+        LBL_pIDTXT.Text(startValue[1]);
         LBL_pIDTXT.TextColor(COLOR_RED);
         LBL_pIDTXT.FontBold(true);
 
@@ -176,7 +180,7 @@ public class Order extends Form implements HandlesEventDispatching {
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
         if (eventName.equals("Click")) {
             if (component.equals(BTN_BuyItem)) {
-                buyThis(ThingsAvailableToBuy_ListView.Selection());
+                buyItemAndUpdateCredit(ThingsAvailableToBuy_ListView.Selection());
                 return true;
             } else {
                 return false;
@@ -193,8 +197,7 @@ public class Order extends Form implements HandlesEventDispatching {
             return true;
         }
         if (component.equals(Web_Credit) && eventName.equals("GotText")) {
-            Log.w("TIN**",(String) params[3]);
-            //JsonCreditThings(params[1].toString(), (String) params[3]);
+            //calling procedure to show credit amount
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"person", "Credit");
             return true;
         }
@@ -210,29 +213,27 @@ public class Order extends Form implements HandlesEventDispatching {
         return false;
     }
 
-    public void buyThis(String x) {
+    public void buyItemAndUpdateCredit(String listSelection) {
         if ((ThingsAvailableToBuy_ListView.Selection().isEmpty())) {
             messages.ShowAlert("No Item Selected");
         } else {
-            int i = x.indexOf("]");
-            int euro = x.indexOf("€") + 1;
-            String price = x.substring(euro);
+            int i = listSelection.indexOf("]");
+            int euro = listSelection.indexOf("€") + 1;
+            String price = listSelection.substring(euro);
             String oldCredit = CreditAmount_Label.Text().replace("€", "");
-            String y = x.substring(1, i);
+            String y = listSelection.substring(1, i);
             String[] url_IDs = y.split(":");
             Web_PlaceOrder.Url(baseURL + "sessionID=" + SessionID + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + pID);
             Web_PlaceOrder.Get();
-            creditUpdateAfterBuy(Double.parseDouble(oldCredit), Double.parseDouble(price));
+            //creditUpdateAfterBuy(Double.parseDouble(oldCredit), Double.parseDouble(price));
+            Double diffCredit =Double.parseDouble(oldCredit) -Double.parseDouble(price);
+            String newCredit = Double.toString(diffCredit);
+            CreditAmount_Label.Text("€" + newCredit);
+            Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=GET&pID=" +pID + "&Credit=" + newCredit);
+            Web_Credit2.Get();
         }
     }
-    public void creditUpdateAfterBuy(Double x, Double y) {
-        Double i = x - y;
-        String p = Double.toString(i);
-        CreditAmount_Label.Text("€" + p);
-        Web_Credit2.Url(getCreditURL+ "&Credit=" + p);
-        Web_Credit2.Get();
-    }
-    //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
+        //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
     public void jsonSortAndListViewForBuyerScreen(String status, String textOfResponse, String tableName, String fieldName) {
         List<String> ListViewItemArray;
         if (status.equals("200")) try {
@@ -244,11 +245,12 @@ public class Order extends Form implements HandlesEventDispatching {
                 for (int i = 0; i < jsonIsMySon.length(); i++) {
                     String oneEntryInTheListView = "";
                     //add data from table to the sting above by getting the field name you want from the brief ( example where field name is "sellerID": oneEntryInTheListView = jsonIsMySon.getJSONObject(i).getString("sellerID"); )
-                    //formats entries the ListView containing the items in thing table
+                    //gets Credit amount
                     if(tableName.equals("person") && fieldName.equals("Credit")){
                         oneEntryInTheListView = jsonIsMySon.getJSONObject(i).getString("Credit");
                         ListViewItemArray.add(oneEntryInTheListView);
                     }
+                    //formats entries the ListView containing the items in thing table
                     if (tableName.equals("thing") && fieldName.equals("null")){
                         oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("tID")
                                 + " : " + jsonIsMySon.getJSONObject(i).getString("tSoldBy")

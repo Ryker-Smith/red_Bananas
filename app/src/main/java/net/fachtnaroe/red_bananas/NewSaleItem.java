@@ -23,12 +23,15 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
     private Label nameLabel, descriptionLabel, priceLabel, euroSymbolLablel, titleLabel;
     private Web webSaveNewItem;
     private Notifier savedNotifier;
-    private String baseURL = "https://fachtnaroe.net/bananas?",
-            pID = MainActivity.getPID(),
-            sessionID = MainActivity.getSessionID();
+    private String baseURL = "https://fachtnaroe.net/bananas?";
+//            pID = MainActivity.getPID(),
+//            sessionID = MainActivity.getSessionID();
+    private String[] startValue;
 
     protected void $define() {
         this.BackgroundColor(Component.COLOR_ORANGE);
+        //[0]=extra quotation mark(not to be used) [1]=pId [2]=Username [3]=SessionID [4]=extra quotation mark(not to be used)
+        startValue = this.startupValue.split("<SPLIT>");
         VArr = new VerticalArrangement(this);
         VArr.Height(LENGTH_FILL_PARENT);
         VArr.Width(LENGTH_FILL_PARENT);
@@ -125,7 +128,7 @@ public class NewSaleItem extends Form implements HandlesEventDispatching {
     }
 
     public void saveThis() {
-        webSaveNewItem.Url(baseURL + "sessionID=" + sessionID + "&method=POST&entity=thing&tName=" + nameTxtBox.Text() + "&tDescription=" + descriptionTxtBox.Text() + "&tPrice=" + priceTxtBox.Text() + "&tSoldBy=" + pID);
+        webSaveNewItem.Url(baseURL + "sessionID=" + startValue[3] + "&method=POST&entity=thing&tName=" + nameTxtBox.Text() + "&tDescription=" + descriptionTxtBox.Text() + "&tPrice=" + priceTxtBox.Text() + "&tSoldBy=" + startValue[1]);
         webSaveNewItem.Get();
     }
 

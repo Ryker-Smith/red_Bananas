@@ -1,6 +1,7 @@
 package net.fachtnaroe.red_bananas;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.CheckBox;
@@ -31,7 +32,8 @@ public class MainActivity extends Form implements HandlesEventDispatching {
     private String passwordForURL = "", weblogin = "https://fachtnaroe.net/bananas?cmd=LOGIN&user=", webLogin2 = "&pass=", ResonseContent;
     private Web webLoginConnection;
     private Notifier GotTextNotifier;
-    private static String usernameForURL = "", SessionId = "", pID = "";
+//    private static String usernameForURL = "", SessionId = "", pID = "";
+    private String usernameForURL = "", SessionId = "", pID = "";
 
     protected void $define() {
         this.BackgroundColor(Component.COLOR_ORANGE);
@@ -127,16 +129,22 @@ public class MainActivity extends Form implements HandlesEventDispatching {
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
         if (eventName.equals("Click")) {
             if (component.equals(login)) {
-                loginBtnClick();
+                if (!(username.Text().equals("")||password.Text().equals(""))) {
+                    loginBtnClick();
+                }
+                else {GotTextNotifier.ShowAlert("Username or Password Not Entered");}
                 return true;
             }
         }
         else  if (eventName.equals("Changed")) {
+            Log.w("Changed","Changed");
             if (component.equals(buyer)) {
+                Log.w("Changed","1");
                 seller.Checked( !buyer.Checked() );
                 return true;
             }
             else if (component.equals(seller)) {
+                Log.w("Changed","2");
                 buyer.Checked(!seller.Checked());
                 return true;
             }
@@ -174,6 +182,9 @@ public class MainActivity extends Form implements HandlesEventDispatching {
                     switchFormWithStartValue("Order","<SPLIT>"+pID+"<SPLIT>"+usernameForURL+"<SPLIT>"+SessionId+"<SPLIT>");
                 }
             }
+            else{
+                GotTextNotifier.ShowAlert("Login Failed: Username or Password Incorrect");
+            }
         } catch (JSONException e) {
             // if an exception occurs, code for it in here
             GotTextNotifier.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
@@ -183,15 +194,15 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         }
     }
 
-    public static String getUsername() {
-        return usernameForURL;
-    }
-
-    public static String getSessionID() {
-        return SessionId;
-    }
-
-    public static String getPID() {
-        return pID;
-    }
+//    public static String getUsername() {
+//        return usernameForURL;
+//    }
+//
+//    public static String getSessionID() {
+//        return SessionId;
+//    }
+//
+//    public static String getPID() {
+//        return pID;
+//    }
 }

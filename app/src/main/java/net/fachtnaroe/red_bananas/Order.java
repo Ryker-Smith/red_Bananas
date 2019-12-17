@@ -30,10 +30,12 @@ public class Order extends Form implements HandlesEventDispatching {
     private HorizontalArrangement HArr_UserInfo, HArr_Credit_BuyBtn, Harr_Credit, Harr_BuyBtn;
     private ListView ThingsAvailableToBuy_ListView, ThingsOrdered_ListView;
     private String baseURL = "https://fachtnaroe.net/bananas?",
-            SessionID = MainActivity.getSessionID(),
-            pID = MainActivity.getPID(),
-            username = MainActivity.getUsername(),
-            getCreditURL = baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID;
+    getCreditURL="&entity=person&method=GET&pID=",
+    sID="sessionID=";
+//            SessionID = MainActivity.getSessionID(),
+//            pID = MainActivity.getPID(),
+//            username = MainActivity.getUsername(),
+           // getCreditURL = baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID;
     private String[] startValue;
     private Web Web_TfS, Web_TB, Web_Credit, Web_Credit2, Web_PlaceOrder;
     private Notifier messages;
@@ -157,15 +159,15 @@ public class Order extends Form implements HandlesEventDispatching {
         messages.TextColor(Component.COLOR_WHITE);
 
         Web_TfS = new Web(this);
-        Web_TfS.Url(baseURL + "sessionID=" + SessionID + "&entity=thing&method=GET");
+        Web_TfS.Url(baseURL + sID + startValue[3] + "&entity=thing&method=GET");
         Web_TfS.Get();
 
         Web_TB = new Web(this);
-        Web_TB.Url(baseURL + "sessionID=" + SessionID + "&entity=prettyorders&method=GET");
+        Web_TB.Url(baseURL + sID + startValue[3] + "&entity=prettyorders&method=GET");
         Web_TB.Get();
 
         Web_Credit = new Web(this);
-        Web_Credit.Url(getCreditURL);
+        Web_Credit.Url(baseURL + sID + startValue[3] + getCreditURL);
         Web_Credit.Get();
 
         Web_Credit2 = new Web(this);
@@ -223,13 +225,12 @@ public class Order extends Form implements HandlesEventDispatching {
             String oldCredit = CreditAmount_Label.Text().replace("€", "");
             String y = listSelection.substring(1, i);
             String[] url_IDs = y.split(":");
-            Web_PlaceOrder.Url(baseURL + "sessionID=" + SessionID + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + pID);
+            Web_PlaceOrder.Url(baseURL + sID + startValue[3] + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + startValue[1]);
             Web_PlaceOrder.Get();
-            //creditUpdateAfterBuy(Double.parseDouble(oldCredit), Double.parseDouble(price));
             Double diffCredit =Double.parseDouble(oldCredit) -Double.parseDouble(price);
             String newCredit = Double.toString(diffCredit);
             CreditAmount_Label.Text("€" + newCredit);
-            Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=GET&pID=" +pID + "&Credit=" + newCredit);
+            Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=GET&pID=" + startValue[1] + "&Credit=" + newCredit);
             Web_Credit2.Get();
         }
     }
@@ -260,7 +261,7 @@ public class Order extends Form implements HandlesEventDispatching {
                         ListViewItemArray.add(oneEntryInTheListView);
                     }
                     //formats entries the ListView containing the orders buyer has placed
-                    else if ((tableName.equals("prettyorders") && fieldName.equals("buyerID")) && (Integer.valueOf(jsonIsMySon.getJSONObject(i).getString(fieldName)).equals( Integer.valueOf(pID)))) {
+                    else if ((tableName.equals("prettyorders") && fieldName.equals("buyerID")) && (Integer.valueOf(jsonIsMySon.getJSONObject(i).getString(fieldName)).equals( Integer.valueOf(startValue[1])))) {
                         oneEntryInTheListView = "[" + jsonIsMySon.getJSONObject(i).getString("oID")
                                 + "] " + jsonIsMySon.getJSONObject(i).getString("tName")
                                 + " from " + jsonIsMySon.getJSONObject(i).getString("seller")

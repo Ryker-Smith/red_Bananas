@@ -63,8 +63,8 @@ public class Sales extends Form implements HandlesEventDispatching {
         VArr.Image("FDS_PossibleLogo_04.png");
 
         titleFDS = new Label(VArr);
-        //titleFDS.Text("Food Delivery Service");
-        titleFDS.Text(startValue[1]+" wow "+startValue[2]+" wow "+startValue[3]);
+        titleFDS.Text("Food Delivery Service");
+        //titleFDS.Text(startValue[1]+" wow "+startValue[2]+" wow "+startValue[3]);
         titleFDS.FontSize(20);
         titleFDS.FontBold(true);
         titleFDS.Width(LENGTH_FILL_PARENT);

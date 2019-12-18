@@ -1,6 +1,7 @@
 package net.fachtnaroe.red_bananas;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
@@ -29,9 +30,7 @@ public class Order extends Form implements HandlesEventDispatching {
     private Label LBL_Title, LBL_UserN, LBL_UserTXT, LBL_pID, LBL_pIDTXT, LBL_AvToOrdr, LBL_Credit, CreditAmount_Label, LBL_Ordered;
     private HorizontalArrangement HArr_UserInfo, HArr_Credit_BuyBtn, Harr_Credit, Harr_BuyBtn;
     private ListView ThingsAvailableToBuy_ListView, ThingsOrdered_ListView;
-    private String baseURL = "https://fachtnaroe.net/bananas?",
-    getCreditURL="&entity=person&method=GET&pID=",
-    sID="sessionID=";
+    private String baseURL = "https://fachtnaroe.net/bananas?", getCreditURL="&entity=person&method=GET&pID=", sID="sessionID=";
 //            SessionID = MainActivity.getSessionID(),
 //            pID = MainActivity.getPID(),
 //            username = MainActivity.getUsername(),
@@ -39,6 +38,7 @@ public class Order extends Form implements HandlesEventDispatching {
     private String[] startValue;
     private Web Web_TfS, Web_TB, Web_Credit, Web_Credit2, Web_PlaceOrder;
     private Notifier messages;
+    private int testnum=1;
 
     protected void $define() {
         this.BackgroundColor(Component.COLOR_ORANGE);
@@ -167,7 +167,7 @@ public class Order extends Form implements HandlesEventDispatching {
         Web_TB.Get();
 
         Web_Credit = new Web(this);
-        Web_Credit.Url(baseURL + sID + startValue[3] + getCreditURL);
+        Web_Credit.Url(baseURL + sID + startValue[3] + getCreditURL + startValue[1]);
         Web_Credit.Get();
 
         Web_Credit2 = new Web(this);
@@ -182,18 +182,20 @@ public class Order extends Form implements HandlesEventDispatching {
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
         if (eventName.equals("Click")) {
             if (component.equals(BTN_BuyItem)) {
-                buyItemAndUpdateCredit(ThingsAvailableToBuy_ListView.Selection());
+                buyItem(ThingsAvailableToBuy_ListView.Selection());
                 return true;
             } else {
                 return false;
             }
         }
         if (component.equals(Web_TfS) && eventName.equals("GotText")) {
+            Log.w("TAGMEBITCH",(String) params[3]);
             //calling the procedure For the ListView containing the Items that are available to buy
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"thing", "null");
             return true;
         }
         if (component.equals(Web_TB) && eventName.equals("GotText")) {
+            Log.w("TAGMEBITCH",(String) params[3]);
             //calling the procedure For the ListView containing the Items that the buyer has ordered
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"prettyorders", "buyerID");
             return true;
@@ -203,19 +205,42 @@ public class Order extends Form implements HandlesEventDispatching {
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"person", "Credit");
             return true;
         }
+        //this bad
         if (component.equals(Web_PlaceOrder) && eventName.equals("GotText")) {
-            String response = ((String) params[3]);
-            if (response.contains("OK")) {
-                String oid = response.substring(22, response.length() - 2);
-                messages.ShowAlert("Your Order Has Been Placed : " + oid);
-
-            }
-            return true;
+            jsonConfirmOrderPlaced(params[1].toString(), (String) params[3]);
+//            Log.w("TAGMEBITCH",(String) params[3]+"   "+params[1].toString());
+//            String response = ((String) params[3]);
+//            if (response.contains("OK")) {
+//                String oid = response.substring(22, response.length() - 2);
+//                messages.ShowAlert("Your Order Has Been Placed : " + oid);
+//                Web_TB.Get();
+//            }
+//            return true;
         }
         return false;
     }
-
-    public void buyItemAndUpdateCredit(String listSelection) {
+    public void jsonConfirmOrderPlaced(String status, String textOfResponse) {
+        if (status.equals("200")) try {
+            // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
+            JSONObject parser = new JSONObject(textOfResponse);
+            String status_json = parser.getString("Status");
+            Log.w("TAGMEBITCH",status_json);
+            if(status_json.contains("OK")){
+                String oID = parser.getString("oID");
+                messages.ShowAlert("Your Order Has Been Placed : " + oID);
+                Web_TB.Get();
+                Web_Credit.Get();
+               Log.w("TAGMEBITCH",oID);
+            }
+        } catch (JSONException e) {
+            // if an exception occurs, code for it in here
+            messages.ShowMessageDialog("Error 3.353; JSON Exception (check password) ", "Information", "OK");
+        }
+        else {
+            messages.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
+        }
+    }
+    public void buyItem(String listSelection) {
         if ((ThingsAvailableToBuy_ListView.Selection().isEmpty())) {
             messages.ShowAlert("No Item Selected");
         } else {
@@ -226,12 +251,14 @@ public class Order extends Form implements HandlesEventDispatching {
             String y = listSelection.substring(1, i);
             String[] url_IDs = y.split(":");
             Web_PlaceOrder.Url(baseURL + sID + startValue[3] + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + startValue[1]);
-            Web_PlaceOrder.Get();
+//            Web_PlaceOrder.Get();
             Double diffCredit =Double.parseDouble(oldCredit) -Double.parseDouble(price);
             String newCredit = Double.toString(diffCredit);
-            CreditAmount_Label.Text("€" + newCredit);
-            Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=GET&pID=" + startValue[1] + "&Credit=" + newCredit);
+            //CreditAmount_Label.Text("€" + newCredit);
+            Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=PUT&pID=" + startValue[1] + "&Credit=" + newCredit);
             Web_Credit2.Get();
+            //Web_Credit.Get();
+            Web_PlaceOrder.Get();
         }
     }
         //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
@@ -275,6 +302,8 @@ public class Order extends Form implements HandlesEventDispatching {
                 }
                 if (tableName.equals("prettyorders") && fieldName.equals("buyerID")) {
                     ThingsOrdered_ListView.Elements(tempData);
+                    testnum++;
+                    LBL_Title.Text(Integer.toString(testnum));
                 }
                 if (tableName.equals("thing") && fieldName.equals("null")) {
                     ThingsAvailableToBuy_ListView.Elements(tempData);

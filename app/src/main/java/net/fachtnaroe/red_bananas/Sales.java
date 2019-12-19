@@ -1,6 +1,8 @@
 package net.fachtnaroe.red_bananas;
 
 import android.graphics.Color;
+import android.util.Log;
+
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.EventDispatcher;
@@ -179,6 +181,16 @@ public class Sales extends Form implements HandlesEventDispatching {
             jsonSortAndListViewForSellerScreen(params[1].toString(), (String) params[3],"orders", "sellerID");
             return true;
         }
+        else if (component.equals(webThingDelete) && eventName.equals("GotText")) {
+            //Update Things for sale ListView
+            webGetThings4Sale.Get();
+            return true;
+        }
+        else if (component.equals(webOrderIsComplete) && eventName.equals("GotText")) {
+            //Update Things sold ListView
+            webGetThingsSold.Get();
+            return true;
+        }
         return false;
     }
     public void removeCompletedOrderFromThingsSold(String selection) {
@@ -191,7 +203,6 @@ public class Sales extends Form implements HandlesEventDispatching {
             webOrderIsComplete.Url(baseURL+sID+startValue[3]+webOrderIsCompleteURL + oIDForURL);
             webOrderIsComplete.Get();
             GotTextNotifier.ShowAlert("Order " + oIDForURL + " removed");
-            webGetThingsSold.Get();
         }
     }
     public void deleteItemFromThingsForSale(String selection) {
@@ -204,7 +215,6 @@ public class Sales extends Form implements HandlesEventDispatching {
             webThingDelete.Url(baseURL+sID+startValue[3]+ webThingDeleteURL + tIDForURL);
             webThingDelete.Get();
             GotTextNotifier.ShowAlert("Item " + tIDForURL + " removed");
-            webGetThings4Sale.Get();
         }
     }
     //this procedure can be called for both listViews, (uses the kawa-1.7 library)

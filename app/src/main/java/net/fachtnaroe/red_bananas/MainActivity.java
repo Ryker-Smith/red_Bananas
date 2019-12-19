@@ -66,7 +66,6 @@ public class MainActivity extends Form implements HandlesEventDispatching {
 
         username = new TextBox(Harr_UserInfo);
         username.Width(LENGTH_FILL_PARENT);
-        username.Text("redcustomer");
         username.BackgroundColor(Component.COLOR_WHITE);
 
         Harr_Password = new HorizontalArrangement(Varr1);
@@ -75,7 +74,6 @@ public class MainActivity extends Form implements HandlesEventDispatching {
 
         PasswL = new Label(Harr_Password);
         PasswL.WidthPercent(30);
-        PasswL.Text("Password: ");
         PasswL.TextColor(COLOR_BLACK);
         PasswL.TextAlignment(ALIGNMENT_OPPOSITE);
 

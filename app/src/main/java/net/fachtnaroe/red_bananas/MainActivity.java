@@ -1,8 +1,6 @@
 package net.fachtnaroe.red_bananas;
 
-import android.content.Intent;
 import android.util.Log;
-
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.CheckBox;
 import com.google.appinventor.components.runtime.Component;
@@ -16,7 +14,6 @@ import com.google.appinventor.components.runtime.PasswordTextBox;
 import com.google.appinventor.components.runtime.TextBox;
 import com.google.appinventor.components.runtime.VerticalArrangement;
 import com.google.appinventor.components.runtime.Web;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,24 +26,26 @@ public class MainActivity extends Form implements HandlesEventDispatching {
     private Button login;
     private VerticalArrangement Varr1;
     private HorizontalArrangement Harr_EmptySpaceAfterTitle, Harr_UserInfo, Harr_Password, Harr_Checkboxes, H1_EmptySpaceBefore, H2_EmptySpaceAfter, Harr_EmptySpaceBeforeLoginBtn;
-    private String passwordForURL = "", weblogin = "https://fachtnaroe.net/bananas?cmd=LOGIN&user=", webLogin2 = "&pass=", ResonseContent;
+    private String passwordForURL = "", weblogin = "https://fachtnaroe.net/bananas?cmd=LOGIN&user=", webLogin2 = "&pass=", usernameForURL = "", SessionId = "", pID = "";
     private Web webLoginConnection;
     private Notifier GotTextNotifier;
-//    private static String usernameForURL = "", SessionId = "", pID = "";
-    private String usernameForURL = "", SessionId = "", pID = "";
 
     protected void $define() {
         this.BackgroundColor(Component.COLOR_ORANGE);
+
         webLoginConnection = new Web(this);
+
         GotTextNotifier = new Notifier(this);
-        GotTextNotifier.BackgroundColor(Component.COLOR_BLACK);
+        GotTextNotifier.BackgroundColor(Component.COLOR_RED);
+        GotTextNotifier.TextColor(Component.COLOR_WHITE);
+
         Varr1 = new VerticalArrangement(this);
         Varr1.Height(LENGTH_FILL_PARENT);
         Varr1.Width(LENGTH_FILL_PARENT);
         Varr1.Image("FDS_PossibleLogo_03.png");
+
         title = new Label(Varr1);
         title.Width(LENGTH_FILL_PARENT);
-//        title.HeightPercent(20);
         title.Text("Food Delivery Service");
         title.TextColor(COLOR_BLACK);
         title.FontBold(true);
@@ -90,6 +89,7 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         Harr_Checkboxes.Width(LENGTH_FILL_PARENT);
         Harr_Checkboxes.HeightPercent(20);
 
+        //Space to left of checkboxes so they appear centered
         H1_EmptySpaceBefore = new HorizontalArrangement(Harr_Checkboxes);
         H1_EmptySpaceBefore.WidthPercent(20);
 
@@ -106,6 +106,7 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         seller.FontSize(25);
         seller.Checked(false);
 
+        //Space to right of checkboxes so they appear centered
         H2_EmptySpaceAfter = new HorizontalArrangement(Harr_Checkboxes);
         H2_EmptySpaceAfter.WidthPercent(20);
 
@@ -155,14 +156,14 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         }
         return false;
     }
-
+    //send the login details to backend
     public void loginBtnClick() {
             usernameForURL = username.Text();
             passwordForURL = password.Text();
             webLoginConnection.Url(weblogin + usernameForURL + webLogin2 + passwordForURL);
             webLoginConnection.Get();
     }
-    //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
+    //after GotText check the login and change screens
     public void jsonLoginCheckAndValuePasser(String status, String textOfResponse) {
         if (status.equals("200")) try {
             // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
@@ -172,13 +173,9 @@ public class MainActivity extends Form implements HandlesEventDispatching {
                 pID = parser.getString("pID");
                 SessionId = parser.getString("sessionID");
                 if (seller.Checked()) {
-                    //Intent i = new Intent(getApplicationContext(), Sales.class);
-                    //startActivity(i);
                     switchFormWithStartValue("Sales","<SPLIT>"+pID+"<SPLIT>"+usernameForURL+"<SPLIT>"+SessionId+"<SPLIT>");
                 }
                 else {
-//                    Intent i = new Intent(getApplicationContext(), Order.class);
-//                    startActivity(i);
                     switchFormWithStartValue("Order","<SPLIT>"+pID+"<SPLIT>"+usernameForURL+"<SPLIT>"+SessionId+"<SPLIT>");
                 }
             }
@@ -193,16 +190,4 @@ public class MainActivity extends Form implements HandlesEventDispatching {
             GotTextNotifier.ShowMessageDialog("Error 3.356; Problem connecting with server", "Information", "OK");
         }
     }
-
-//    public static String getUsername() {
-//        return usernameForURL;
-//    }
-//
-//    public static String getSessionID() {
-//        return SessionId;
-//    }
-//
-//    public static String getPID() {
-//        return pID;
-//    }
 }

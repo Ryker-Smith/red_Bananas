@@ -1,8 +1,6 @@
 package net.fachtnaroe.red_bananas;
 
 import android.graphics.Color;
-import android.util.Log;
-
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.EventDispatcher;
@@ -15,11 +13,9 @@ import com.google.appinventor.components.runtime.Notifier;
 import com.google.appinventor.components.runtime.VerticalArrangement;
 import com.google.appinventor.components.runtime.Web;
 import com.google.appinventor.components.runtime.util.YailList;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,14 +27,9 @@ public class Order extends Form implements HandlesEventDispatching {
     private HorizontalArrangement HArr_UserInfo, HArr_Credit_BuyBtn, Harr_Credit, Harr_BuyBtn;
     private ListView ThingsAvailableToBuy_ListView, ThingsOrdered_ListView;
     private String baseURL = "https://fachtnaroe.net/bananas?", getCreditURL="&entity=person&method=GET&pID=", sID="sessionID=";
-//            SessionID = MainActivity.getSessionID(),
-//            pID = MainActivity.getPID(),
-//            username = MainActivity.getUsername(),
-           // getCreditURL = baseURL + "sessionID=" + SessionID + "&entity=person&method=GET&pID=" + pID;
     private String[] startValue;
     private Web Web_TfS, Web_TB, Web_Credit, Web_Credit2, Web_PlaceOrder;
     private Notifier messages;
-    private int testnum=1;
 
     protected void $define() {
         this.BackgroundColor(Component.COLOR_ORANGE);
@@ -72,9 +63,8 @@ public class Order extends Form implements HandlesEventDispatching {
         LBL_UserTXT = new Label(HArr_UserInfo);
         LBL_UserTXT.Width(LENGTH_FILL_PARENT);
         LBL_UserTXT.FontSize(15);
-//        LBL_UserTXT.Text(username);
         LBL_UserTXT.Text(startValue[2]);
-        LBL_UserTXT.TextColor(COLOR_RED);
+        LBL_UserTXT.TextColor(COLOR_BLUE);
         LBL_UserTXT.FontBold(true);
 
         LBL_pID = new Label(HArr_UserInfo);
@@ -84,9 +74,8 @@ public class Order extends Form implements HandlesEventDispatching {
 
         LBL_pIDTXT = new Label(HArr_UserInfo);
         LBL_pIDTXT.FontSize(15);
-//        LBL_pIDTXT.Text(pID);
         LBL_pIDTXT.Text(startValue[1]);
-        LBL_pIDTXT.TextColor(COLOR_RED);
+        LBL_pIDTXT.TextColor(Component.COLOR_BLUE);
         LBL_pIDTXT.FontBold(true);
 
         LBL_AvToOrdr = new Label(VArr);
@@ -188,34 +177,24 @@ public class Order extends Form implements HandlesEventDispatching {
                 return false;
             }
         }
-        if (component.equals(Web_TfS) && eventName.equals("GotText")) {
-            Log.w("TAGMEBITCH",(String) params[3]);
+        else if (component.equals(Web_TfS) && eventName.equals("GotText")) {
             //calling the procedure For the ListView containing the Items that are available to buy
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"thing", "null");
             return true;
         }
-        if (component.equals(Web_TB) && eventName.equals("GotText")) {
-            Log.w("TAGMEBITCH",(String) params[3]);
+        else if (component.equals(Web_TB) && eventName.equals("GotText")) {
             //calling the procedure For the ListView containing the Items that the buyer has ordered
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"prettyorders", "buyerID");
             return true;
         }
-        if (component.equals(Web_Credit) && eventName.equals("GotText")) {
+        else if (component.equals(Web_Credit) && eventName.equals("GotText")) {
             //calling procedure to show credit amount
             jsonSortAndListViewForBuyerScreen(params[1].toString(), (String) params[3],"person", "Credit");
             return true;
         }
-        //this bad
-        if (component.equals(Web_PlaceOrder) && eventName.equals("GotText")) {
+        else if (component.equals(Web_PlaceOrder) && eventName.equals("GotText")) {
+            //procedure to check if order was placed
             jsonConfirmOrderPlaced(params[1].toString(), (String) params[3]);
-//            Log.w("TAGMEBITCH",(String) params[3]+"   "+params[1].toString());
-//            String response = ((String) params[3]);
-//            if (response.contains("OK")) {
-//                String oid = response.substring(22, response.length() - 2);
-//                messages.ShowAlert("Your Order Has Been Placed : " + oid);
-//                Web_TB.Get();
-//            }
-//            return true;
         }
         return false;
     }
@@ -224,13 +203,11 @@ public class Order extends Form implements HandlesEventDispatching {
             // See:  https://stackoverflow.com/questions/5015844/parsing-json-object-in-java
             JSONObject parser = new JSONObject(textOfResponse);
             String status_json = parser.getString("Status");
-            Log.w("TAGMEBITCH",status_json);
             if(status_json.contains("OK")){
                 String oID = parser.getString("oID");
                 messages.ShowAlert("Your Order Has Been Placed : " + oID);
                 Web_TB.Get();
                 Web_Credit.Get();
-               Log.w("TAGMEBITCH",oID);
             }
         } catch (JSONException e) {
             // if an exception occurs, code for it in here
@@ -251,17 +228,14 @@ public class Order extends Form implements HandlesEventDispatching {
             String y = listSelection.substring(1, i);
             String[] url_IDs = y.split(":");
             Web_PlaceOrder.Url(baseURL + sID + startValue[3] + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + startValue[1]);
-//            Web_PlaceOrder.Get();
-            Double diffCredit =Double.parseDouble(oldCredit) -Double.parseDouble(price);
+            Double diffCredit = Double.parseDouble(oldCredit) - Double.parseDouble(price);
             String newCredit = Double.toString(diffCredit);
-            //CreditAmount_Label.Text("€" + newCredit);
             Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=PUT&pID=" + startValue[1] + "&Credit=" + newCredit);
             Web_Credit2.Get();
-            //Web_Credit.Get();
             Web_PlaceOrder.Get();
         }
     }
-        //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
+        //this procedure can be called for both listViews, (uses the kawa-1.7 library)
     public void jsonSortAndListViewForBuyerScreen(String status, String textOfResponse, String tableName, String fieldName) {
         List<String> ListViewItemArray;
         if (status.equals("200")) try {
@@ -302,8 +276,6 @@ public class Order extends Form implements HandlesEventDispatching {
                 }
                 if (tableName.equals("prettyorders") && fieldName.equals("buyerID")) {
                     ThingsOrdered_ListView.Elements(tempData);
-                    testnum++;
-                    LBL_Title.Text(Integer.toString(testnum));
                 }
                 if (tableName.equals("thing") && fieldName.equals("null")) {
                     ThingsAvailableToBuy_ListView.Elements(tempData);

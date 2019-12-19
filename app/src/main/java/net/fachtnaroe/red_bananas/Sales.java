@@ -1,8 +1,6 @@
 package net.fachtnaroe.red_bananas;
 
-import android.content.Intent;
 import android.graphics.Color;
-
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.EventDispatcher;
@@ -15,33 +13,24 @@ import com.google.appinventor.components.runtime.Notifier;
 import com.google.appinventor.components.runtime.VerticalArrangement;
 import com.google.appinventor.components.runtime.Web;
 import com.google.appinventor.components.runtime.util.YailList;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Sales extends Form implements HandlesEventDispatching {
-    private Button butt1, btnDelete, btnAddNew, btnOrderIsCompleted;
+    private Button btnDelete, btnAddNew, btnOrderIsCompleted;
     private VerticalArrangement VArr;
     private HorizontalArrangement HArr_User_pID, HArr2Btn;
     private Label titleFDS, Label_Username, Username_L, Label_pID, pId_L, things4Sale_Label, thingsSold_Label;
     private ListView thingsWeSell_ListView, OrdersPlaced_ListView;
     private String baseURL = "https://fachtnaroe.net/bananas?",
-           // TheUsername = MainActivity.getUsername(),
-           // pID = MainActivity.getPID(),
-            //SessionID = MainActivity.getSessionID(),
-//            getThingsForSaleURL = baseURL + "sessionID=" + SessionID + "&entity=thing&method=GET",
-//            getThingsSoldURL = baseURL + "sessionID=" + SessionID + "&entity=orders&method=GET",
-//            webThingDeletURL = baseURL + "sessionID=" + SessionID + "&entity=thing&method=DELETE&tID=",
-//            webOrderIsCompleteURL = baseURL + "sessionID=" + SessionID + "&entity=orders&method=DELETE&oID=",
             sID = "sessionID=",
             getThingsForSaleURL = "&entity=thing&method=GET",
             getThingsSoldURL = "&entity=orders&method=GET",
-            webThingDeletURL =  "&entity=thing&method=DELETE&tID=",
+            webThingDeleteURL =  "&entity=thing&method=DELETE&tID=",
             webOrderIsCompleteURL = "&entity=orders&method=DELETE&oID=";
     private String[] startValue;
     private Web webGetThings4Sale, webGetThingsSold, webThingDelete, webOrderIsComplete;
@@ -64,7 +53,6 @@ public class Sales extends Form implements HandlesEventDispatching {
 
         titleFDS = new Label(VArr);
         titleFDS.Text("Food Delivery Service");
-        //titleFDS.Text(startValue[1]+" wow "+startValue[2]+" wow "+startValue[3]);
         titleFDS.FontSize(20);
         titleFDS.FontBold(true);
         titleFDS.Width(LENGTH_FILL_PARENT);
@@ -86,7 +74,6 @@ public class Sales extends Form implements HandlesEventDispatching {
         Username_L.TextAlignment(Component.ALIGNMENT_NORMAL);
         Username_L.FontSize(14);
         Username_L.TextColor(COLOR_BLUE);
-        //Username_L.Text(TheUsername);
         Username_L.Text(startValue[2]);
 
         Label_pID = new Label(HArr_User_pID);
@@ -98,7 +85,6 @@ public class Sales extends Form implements HandlesEventDispatching {
         pId_L.TextAlignment(Component.ALIGNMENT_NORMAL);
         pId_L.FontSize(14);
         pId_L.TextColor(COLOR_BLUE);
-       // pId_L.Text(pID);
         pId_L.Text(startValue[1]);
 
         things4Sale_Label = new Label(VArr);
@@ -108,7 +94,6 @@ public class Sales extends Form implements HandlesEventDispatching {
         things4Sale_Label.Text("My things for sale");
         things4Sale_Label.BackgroundColor(Color.parseColor("#005200"));
 
-        //put a listview here(muoy impotante)
         thingsWeSell_ListView = new ListView(VArr);
         thingsWeSell_ListView.Width(LENGTH_FILL_PARENT);
         thingsWeSell_ListView.Height(LENGTH_FILL_PARENT);
@@ -137,7 +122,6 @@ public class Sales extends Form implements HandlesEventDispatching {
         thingsSold_Label.TextColor(COLOR_WHITE);
         thingsSold_Label.BackgroundColor(Color.parseColor("#005200"));
 
-        //Listview Here
         OrdersPlaced_ListView = new ListView(VArr);
         OrdersPlaced_ListView.Width(LENGTH_FILL_PARENT);
         OrdersPlaced_ListView.HeightPercent(30);
@@ -163,63 +147,45 @@ public class Sales extends Form implements HandlesEventDispatching {
 
         webOrderIsComplete = new Web(this);
 
-//        butt1 = new Button(VArr);
-//        butt1.Text("Go Back");
-//        butt1.FontSize(14);
-//        butt1.Width(LENGTH_FILL_PARENT);
-//        butt1.HeightPercent(10);
-
         EventDispatcher.registerEventForDelegation(this, formName, "Click");
         EventDispatcher.registerEventForDelegation(this, formName, "GotText");
     }
 
     public boolean dispatchEvent(Component component, String componentName, String eventName, Object[] params) {
         if (eventName.equals("Click")) {
-//            if (component.equals(butt1)) {
-//                mainActGo();
-//                return true;
-//            }
             if (component.equals(btnAddNew)) {
-                NewSaleItemScreenGo();
+                //go to NewSaleItem Screen with StartValue
+                switchFormWithStartValue("NewSaleItem",this.startupValue);
                 return true;
             }
-            if (component.equals(btnDelete)) {
+            else if (component.equals(btnDelete)) {
                 //delete from top ListView
                 deleteItemFromThingsForSale(thingsWeSell_ListView.Selection());
                 return true;
             }
-            if (component.equals(btnOrderIsCompleted)) {
+            else if (component.equals(btnOrderIsCompleted)) {
                 //delete from bottom listView
                 removeCompletedOrderFromThingsSold(OrdersPlaced_ListView.Selection());
                 return true;
             }
         }
-        if (component.equals(webGetThings4Sale) && eventName.equals("GotText")) {
+        else if (component.equals(webGetThings4Sale) && eventName.equals("GotText")) {
             //calling the procedure For the ListView containing the Items that the seller has for sale
             jsonSortAndListViewForSellerScreen(params[1].toString(), (String) params[3],"thing", "tSoldBy");
             return true;
         }
-        if (component.equals(webGetThingsSold) && eventName.equals("GotText")) {
+        else if (component.equals(webGetThingsSold) && eventName.equals("GotText")) {
             //calling the procedure For the ListView containing the Orders that have been placed to the seller
             jsonSortAndListViewForSellerScreen(params[1].toString(), (String) params[3],"orders", "sellerID");
             return true;
         }
         return false;
     }
-//    public void mainActGo() {
-//        Intent i = new Intent(getApplicationContext(), MainActivity.class);
-//        startActivity(i);
-//    }
-    public void NewSaleItemScreenGo() {
-//        Intent i = new Intent(getApplicationContext(), NewSaleItem.class);
-//        startActivity(i);
-        switchFormWithStartValue("NewSaleItem",this.startupValue);
-
-    }
     public void removeCompletedOrderFromThingsSold(String selection) {
         if ((OrdersPlaced_ListView.Selection().isEmpty())) {
             GotTextNotifier.ShowAlert("No Order Selected");
-        } else {
+        }
+        else {
             int endPoint = selection.indexOf(']');
             String oIDForURL = selection.substring(1, endPoint);
             webOrderIsComplete.Url(baseURL+sID+startValue[3]+webOrderIsCompleteURL + oIDForURL);
@@ -231,16 +197,17 @@ public class Sales extends Form implements HandlesEventDispatching {
     public void deleteItemFromThingsForSale(String selection) {
         if ((thingsWeSell_ListView.Selection().isEmpty())) {
             GotTextNotifier.ShowAlert("No Item Selected");
-        } else {
+        }
+        else {
             int endPoint = selection.indexOf(']');
             String tIDForURL = selection.substring(1, endPoint);
-            webThingDelete.Url(baseURL+sID+startValue[3]+webThingDeletURL + tIDForURL);
+            webThingDelete.Url(baseURL+sID+startValue[3]+ webThingDeleteURL + tIDForURL);
             webThingDelete.Get();
             GotTextNotifier.ShowAlert("Item " + tIDForURL + " removed");
             webGetThings4Sale.Get();
         }
     }
-    //this procedure can be called for both listViews, (Slightly Altered code I got from Fachtna that is more efficient than the previous code and uses the kawa-1.7 library)
+    //this procedure can be called for both listViews, (uses the kawa-1.7 library)
     public void jsonSortAndListViewForSellerScreen(String status, String textOfResponse, String tableName, String fieldName) {
         List<String> ListViewItemArray;
         if (status.equals("200")) try {

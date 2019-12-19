@@ -1,6 +1,5 @@
 package net.fachtnaroe.red_bananas;
 
-import android.util.Log;
 import com.google.appinventor.components.runtime.Button;
 import com.google.appinventor.components.runtime.CheckBox;
 import com.google.appinventor.components.runtime.Component;

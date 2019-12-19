@@ -52,7 +52,7 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         title.TextAlignment(Component.ALIGNMENT_CENTER);
 
         Harr_EmptySpaceAfterTitle = new HorizontalArrangement(Varr1);
-        Harr_EmptySpaceAfterTitle.Height(LENGTH_FILL_PARENT);
+        Harr_EmptySpaceAfterTitle.HeightPercent(30);
 
         Harr_UserInfo = new HorizontalArrangement(Varr1);
         Harr_UserInfo.Width(LENGTH_FILL_PARENT);

@@ -74,13 +74,13 @@ public class MainActivity extends Form implements HandlesEventDispatching {
 
         PasswL = new Label(Harr_Password);
         PasswL.WidthPercent(30);
+        PasswL.Text("Password: ");
         PasswL.TextColor(COLOR_BLACK);
         PasswL.TextAlignment(ALIGNMENT_OPPOSITE);
 
 
         password = new PasswordTextBox(Harr_Password);
         password.Width(LENGTH_FILL_PARENT);
-        password.Text("tcfetcfe");
         password.BackgroundColor(Component.COLOR_WHITE);
 
         Harr_Checkboxes = new HorizontalArrangement(Varr1);

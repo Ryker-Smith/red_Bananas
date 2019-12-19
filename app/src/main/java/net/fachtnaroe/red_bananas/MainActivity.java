@@ -136,14 +136,11 @@ public class MainActivity extends Form implements HandlesEventDispatching {
             }
         }
         else  if (eventName.equals("Changed")) {
-            Log.w("Changed","Changed");
             if (component.equals(buyer)) {
-                Log.w("Changed","1");
                 seller.Checked( !buyer.Checked() );
                 return true;
             }
             else if (component.equals(seller)) {
-                Log.w("Changed","2");
                 buyer.Checked(!seller.Checked());
                 return true;
             }

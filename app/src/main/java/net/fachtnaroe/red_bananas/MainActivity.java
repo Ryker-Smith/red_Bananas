@@ -48,7 +48,7 @@ public class MainActivity extends Form implements HandlesEventDispatching {
         title.Text("Food Delivery Service");
         title.TextColor(COLOR_BLACK);
         title.FontBold(true);
-        title.FontSize(60);
+        title.FontSize(36);
         title.TextAlignment(Component.ALIGNMENT_CENTER);
 
         Harr_EmptySpaceAfterTitle = new HorizontalArrangement(Varr1);

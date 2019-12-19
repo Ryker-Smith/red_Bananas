@@ -89,7 +89,7 @@ public class Order extends Form implements HandlesEventDispatching {
         ThingsAvailableToBuy_ListView = new ListView(VArr);
         ThingsAvailableToBuy_ListView.Width(LENGTH_FILL_PARENT);
         ThingsAvailableToBuy_ListView.Height(LENGTH_FILL_PARENT);
-        ThingsAvailableToBuy_ListView.TextSize(50);
+        ThingsAvailableToBuy_ListView.TextSize(14);
         ThingsAvailableToBuy_ListView.TextColor(Component.COLOR_BLACK);
         ThingsAvailableToBuy_ListView.SelectionColor(Color.parseColor("#009F00"));
         ThingsAvailableToBuy_ListView.BackgroundColor(Component.COLOR_NONE);
@@ -139,7 +139,7 @@ public class Order extends Form implements HandlesEventDispatching {
         ThingsOrdered_ListView.Width(LENGTH_FILL_PARENT);
         ThingsOrdered_ListView.HeightPercent(30);
         ThingsOrdered_ListView.TextColor(Component.COLOR_BLACK);
-        ThingsOrdered_ListView.TextSize(50);
+        ThingsOrdered_ListView.TextSize(14);
         ThingsOrdered_ListView.SelectionColor(Color.parseColor("#009F00"));
         ThingsOrdered_ListView.BackgroundColor(Component.COLOR_NONE);
 

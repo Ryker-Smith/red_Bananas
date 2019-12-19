@@ -99,7 +99,7 @@ public class Sales extends Form implements HandlesEventDispatching {
         thingsWeSell_ListView = new ListView(VArr);
         thingsWeSell_ListView.Width(LENGTH_FILL_PARENT);
         thingsWeSell_ListView.Height(LENGTH_FILL_PARENT);
-        thingsWeSell_ListView.TextSize(50);
+        thingsWeSell_ListView.TextSize(14);
         thingsWeSell_ListView.TextColor(Component.COLOR_BLACK);
         thingsWeSell_ListView.SelectionColor(Color.parseColor("#009F00"));
         thingsWeSell_ListView.BackgroundColor(Component.COLOR_NONE);
@@ -127,7 +127,7 @@ public class Sales extends Form implements HandlesEventDispatching {
         OrdersPlaced_ListView = new ListView(VArr);
         OrdersPlaced_ListView.Width(LENGTH_FILL_PARENT);
         OrdersPlaced_ListView.HeightPercent(30);
-        OrdersPlaced_ListView.TextSize(50);
+        OrdersPlaced_ListView.TextSize(14);
         OrdersPlaced_ListView.TextColor(Component.COLOR_BLACK);
         OrdersPlaced_ListView.SelectionColor(Color.parseColor("#009F00"));
         OrdersPlaced_ListView.BackgroundColor(Component.COLOR_NONE);

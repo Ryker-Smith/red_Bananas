@@ -229,10 +229,15 @@ public class Order extends Form implements HandlesEventDispatching {
             String[] url_IDs = y.split(":");
             Web_PlaceOrder.Url(baseURL + sID + startValue[3] + "&entity=orders&method=POST&tID=" + url_IDs[0] + "&sellerID=" + url_IDs[1] + "&slotNum=1&buyerID=" + startValue[1]);
             Double diffCredit = Double.parseDouble(oldCredit) - Double.parseDouble(price);
-            String newCredit = Double.toString(diffCredit);
-            Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=PUT&pID=" + startValue[1] + "&Credit=" + newCredit);
-            Web_Credit2.Get();
-            Web_PlaceOrder.Get();
+            if(diffCredit>=0) {
+                String newCredit = Double.toString(diffCredit);
+                Web_Credit2.Url("https://fachtnaroe.net/bananas?sessionID=a1b2c3d4&entity=person&method=PUT&pID=" + startValue[1] + "&Credit=" + newCredit);
+                Web_Credit2.Get();
+                Web_PlaceOrder.Get();
+            }
+            else{
+                messages.ShowAlert("Insufficient Funds");
+            }
         }
     }
         //this procedure can be called for both listViews, (uses the kawa-1.7 library)
